@@ -1,0 +1,9 @@
+[package]
+name = "webdriver-downloader"
+version = "0.1.0"
+edition = "2021"
+authors = ["ik1ne <ik1ne@naver.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
