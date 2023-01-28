@@ -7,3 +7,18 @@ authors = ["ik1ne <ik1ne@naver.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1"
+async-trait = "0.1"
+clap = { version = "4", features = ["cargo", "string"] }
+fantoccini = "0.19"
+semver = "1"
+tokio = { version = "1.24", features = ["rt-multi-thread", "macros"] }
+serde_json = "1"
+
+home = "0.5"
+reqwest = "0.11"
+regex = "1"
+scraper = "0.14"
+tempfile = "3"
+thiserror = "1"
+zip = "0.6"
