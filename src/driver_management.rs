@@ -1,19 +1,31 @@
-pub mod chromedriver_info;
-pub mod installation_info;
-pub mod url_info;
-pub mod verification_info;
+use std::fs::rename;
 
 use anyhow::{bail, Context};
-use std::fs::rename;
 use tempfile::TempDir;
 
 pub use installation_info::WebdriverInstallationInfo;
 pub use url_info::WebdriverUrlInfo;
 pub use verification_info::WebdriverVerificationInfo;
 
-use crate::WebdriverInfo;
+pub mod chromedriver_info;
+pub mod installation_info;
+pub mod url_info;
+pub mod verification_info;
 
-pub async fn download_verify_install(driver_info: impl WebdriverInfo, max_tries: usize) -> anyhow::Result<()> {
+pub trait WebdriverInfo:
+    WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync
+{
+}
+
+impl<T> WebdriverInfo for T where
+    T: WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync
+{
+}
+
+pub async fn download_verify_install(
+    driver_info: impl WebdriverInfo,
+    max_tries: usize,
+) -> anyhow::Result<()> {
     let urls = driver_info.driver_urls(max_tries).await?;
     let url_count = urls.len();
 

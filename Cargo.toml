@@ -3,8 +3,10 @@ name = "webdriver-downloader"
 version = "0.1.0"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+repository = "https://github.com/ik1ne/webdriver-downloader"
+license = "MIT"
+keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", ]
+categories = ["command-line-utilities", ]
 
 [dependencies]
 anyhow = "1"

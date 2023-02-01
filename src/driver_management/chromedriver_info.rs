@@ -39,7 +39,6 @@ impl WebdriverUrlInfo for ChromedriverInfo {
             ));
 
         let output = child.output().ok()?;
-
         lenient_semver::parse(String::from_utf8_lossy(&output.stdout).borrow()).ok()
     }
 
@@ -85,7 +84,7 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
         let capabilities_value = json!( {
             "goog:chromeOption":  {
-                "binary": r"C:\Program Files\Google\Chrome Dev\Application\chrome.exe"
+                "binary": self.browser_path.clone()
             }
         });
 
