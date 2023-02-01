@@ -1,11 +1,12 @@
-use anyhow::{bail, Result};
 use std::path::PathBuf;
+
+use anyhow::{bail, Result};
+
+pub use run::run;
 
 mod build_arg;
 mod check_arg;
 mod run;
-
-pub use run::run;
 
 #[derive(Debug, Copy, Clone)]
 pub(self) enum DriverType {

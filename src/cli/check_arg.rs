@@ -1,6 +1,7 @@
-use anyhow::{bail, Context, Result};
 use std::fs;
 use std::path::Path;
+
+use anyhow::{bail, Context, Result};
 
 pub fn check_driver_install_path<P: AsRef<Path>>(path: &P, mkdir: bool) -> Result<()> {
     let parent = path

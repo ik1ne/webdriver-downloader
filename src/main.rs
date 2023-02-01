@@ -1,9 +1,10 @@
 use anyhow::Result;
-use std::path::Path;
 
 use webdriver_downloader::cli;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    cli::run().await
+    cli::run()
+        .await
+        .map(|_| println!("Webdriver installed successfully."))
 }

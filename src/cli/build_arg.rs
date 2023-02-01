@@ -1,6 +1,7 @@
+use std::path::{Path, PathBuf};
+
 use anyhow::Result;
 use clap::{arg, command, value_parser, ArgMatches};
-use std::path::{Path, PathBuf};
 
 use super::{Args, DriverType};
 
