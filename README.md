@@ -31,7 +31,7 @@ async fn main() {
         PathBuf::from("C:/Program Files/Google/Chrome/Application/chrome.exe"),
     );
 
-    # Tries up to 5 versions of webdrivers.
+    // Tries up to 5 versions of webdrivers.
     download_verify_install(driver_info, 5).await.unwrap();
 }
 ```

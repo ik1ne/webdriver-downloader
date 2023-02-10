@@ -83,7 +83,7 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
 impl WebdriverVerificationInfo for ChromedriverInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
         let capabilities_value = json!( {
-            "goog:chromeOption":  {
+            "goog:chromeOptions":  {
                 "binary": self.browser_path.clone()
             }
         });
