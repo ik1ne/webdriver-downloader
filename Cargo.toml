@@ -3,8 +3,11 @@ name = "webdriver-downloader"
 version = "0.1.0"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
+description = "Cli Interface&Library for webdriver download."
 repository = "https://github.com/ik1ne/webdriver-downloader"
+homepage = "https://github.com/ik1ne/webdriver-downloader"
 license = "MIT"
+readme = "README.md"
 keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", ]
 categories = ["command-line-utilities", ]
 
