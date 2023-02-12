@@ -8,8 +8,10 @@ use regex::Regex;
 use semver::Version;
 use serde_json::json;
 
-use crate::driver_management::url_info::VersionUrl;
-use crate::{WebdriverInstallationInfo, WebdriverUrlInfo, WebdriverVerificationInfo};
+use crate::driver_management::binary_exact_version_hint_url_info::{
+    BinaryExactVersionHintUrlInfo, VersionUrl,
+};
+use crate::{WebdriverInstallationInfo, WebdriverVerificationInfo};
 
 pub struct ChromedriverInfo {
     driver_install_path: PathBuf,
@@ -26,8 +28,8 @@ impl ChromedriverInfo {
 }
 
 #[async_trait]
-impl WebdriverUrlInfo for ChromedriverInfo {
-    fn driver_version_hint(&self) -> Option<Version> {
+impl BinaryExactVersionHintUrlInfo for ChromedriverInfo {
+    fn binary_version(&self) -> Option<Version> {
         let mut child = std::process::Command::new("powershell");
 
         child
