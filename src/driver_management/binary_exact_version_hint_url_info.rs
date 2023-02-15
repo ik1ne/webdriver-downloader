@@ -12,7 +12,7 @@ pub struct VersionUrl {
 }
 
 #[async_trait]
-pub trait BinaryExactVersionHintUrlInfo {
+pub trait BinaryExactVersionHintUrlInfo: WebdriverUrlInfo {
     /// Version hint based on browser's version.
     fn binary_version(&self) -> Option<Version>;
 
@@ -30,7 +30,13 @@ pub trait BinaryExactVersionHintUrlInfo {
 
     /// [`VersionUrl`]s, probably parsed from driver's download page.
     async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>>;
+}
 
+#[async_trait]
+impl<T> WebdriverUrlInfo for T
+where
+    T: BinaryExactVersionHintUrlInfo + Sync,
+{
     async fn driver_urls(&self, limit: usize) -> Result<Vec<String>> {
         let mut url_infos = self.driver_version_urls().await?;
 
@@ -42,23 +48,10 @@ pub trait BinaryExactVersionHintUrlInfo {
             url_infos.sort_by(|left, right| right.driver_version.cmp(&left.driver_version))
         }
 
-        if url_infos.len() > limit {
-            url_infos.drain(limit..);
-        }
-
         Ok(url_infos
             .into_iter()
+            .take(limit)
             .map(|version_url| version_url.url)
             .collect())
-    }
-}
-
-#[async_trait]
-impl<T> WebdriverUrlInfo for T
-where
-    T: BinaryExactVersionHintUrlInfo + Sync,
-{
-    async fn driver_urls(&self, limit: usize) -> Result<Vec<String>> {
-        self.driver_urls(limit).await
     }
 }

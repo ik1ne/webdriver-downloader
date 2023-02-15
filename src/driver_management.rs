@@ -3,15 +3,16 @@ use std::fs::rename;
 use anyhow::{bail, Context};
 use tempfile::TempDir;
 
+pub use chromedriver_info::ChromedriverInfo;
 pub use installation_info::WebdriverInstallationInfo;
 pub use url_info::WebdriverUrlInfo;
 pub use verification_info::WebdriverVerificationInfo;
 
+mod binary_exact_version_hint_url_info;
 pub mod chromedriver_info;
 pub mod installation_info;
 pub mod url_info;
 pub mod verification_info;
-mod binary_exact_version_hint_url_info;
 
 pub trait WebdriverInfo:
     WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync

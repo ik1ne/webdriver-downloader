@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use webdriver_downloader::cli;
+mod cli;
 
 #[tokio::main]
 async fn main() -> Result<()> {

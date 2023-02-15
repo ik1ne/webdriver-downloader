@@ -1,9 +1,3 @@
-pub use driver_management::chromedriver_info::ChromedriverInfo;
-pub use driver_management::download_verify_install;
-pub use driver_management::{
-    WebdriverInstallationInfo, WebdriverUrlInfo, WebdriverVerificationInfo,
-};
+pub use driver_management::*;
 
-pub mod cli;
-
-pub mod driver_management;
+mod driver_management;
