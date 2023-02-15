@@ -8,12 +8,13 @@ pub use installation_info::WebdriverInstallationInfo;
 pub use url_info::WebdriverUrlInfo;
 pub use verification_info::WebdriverVerificationInfo;
 
-mod binary_exact_version_hint_url_info;
-pub mod chromedriver_info;
-pub mod installation_info;
-pub mod url_info;
-pub mod verification_info;
+mod binary_major_version_hint_url_info;
+mod chromedriver_info;
+mod installation_info;
+mod url_info;
+mod verification_info;
 
+/// Information required to download, verify, install driver.
 pub trait WebdriverInfo:
     WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync
 {
@@ -37,10 +38,8 @@ pub async fn download_verify_install(
         let temp_driver_path = driver_info.download_in_tempdir(url, &tempdir).await?;
 
         if driver_info.verify_driver(&temp_driver_path).await.is_ok() {
-            rename(temp_driver_path, driver_info.driver_install_path())
-                .with_context(|| "Failed to install driver to driver_path.")?;
-
-            return Ok(());
+            return rename(temp_driver_path, driver_info.driver_install_path())
+                .with_context(|| "Failed to install driver to driver_path.");
         }
     }
 

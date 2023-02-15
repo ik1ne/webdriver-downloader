@@ -12,11 +12,11 @@ pub struct VersionUrl {
 }
 
 #[async_trait]
-pub trait BinaryExactVersionHintUrlInfo: WebdriverUrlInfo {
-    /// Version hint based on browser's version.
+pub trait BinaryMajorVersionHintUrlInfo: WebdriverUrlInfo {
+    /// Version hint. used by [compare_version](BinaryMajorVersionHintUrlInfo::driver_urls).
     fn binary_version(&self) -> Option<Version>;
 
-    /// Compares versions based on version_hint.
+    /// Compares versions based on `version_hint`.
     /// Prioritizes same major version to version_hint, and then latest version.
     fn compare_version(version_hint: &Version, left: &Version, right: &Version) -> Ordering {
         let left_match = version_hint.major == left.major;
@@ -35,7 +35,7 @@ pub trait BinaryExactVersionHintUrlInfo: WebdriverUrlInfo {
 #[async_trait]
 impl<T> WebdriverUrlInfo for T
 where
-    T: BinaryExactVersionHintUrlInfo + Sync,
+    T: BinaryMajorVersionHintUrlInfo + Sync,
 {
     async fn driver_urls(&self, limit: usize) -> Result<Vec<String>> {
         let mut url_infos = self.driver_version_urls().await?;

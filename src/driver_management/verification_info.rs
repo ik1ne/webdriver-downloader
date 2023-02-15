@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
 
-/// Provides information for verifying an installed driver.
+/// Provides information for verifying a webdriver.
 #[async_trait]
 pub trait WebdriverVerificationInfo {
     /// Capabilities to use for verification.
