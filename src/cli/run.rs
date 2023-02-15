@@ -1,7 +1,6 @@
 use anyhow::Result;
 
-use crate::driver_management::chromedriver_info::ChromedriverInfo;
-use crate::driver_management::download_verify_install;
+use webdriver_downloader::*;
 
 use super::build_arg::*;
 use super::check_arg::*;

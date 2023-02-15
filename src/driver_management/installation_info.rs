@@ -15,7 +15,7 @@ pub trait WebdriverInstallationInfo {
     fn driver_install_path(&self) -> &Path;
 
     /// Driver executable name in archive file.
-    fn driver_name_in_zip(&self) -> &'static str;
+    fn driver_name_in_archive(&self) -> &'static str;
 
     /// Downloads url and extracts the driver inside tempdir.
     async fn download_in_tempdir<U: IntoUrl + Send>(
@@ -28,9 +28,9 @@ pub trait WebdriverInstallationInfo {
         let content = Cursor::new(response.bytes().await?);
 
         let mut archive = ZipArchive::new(content)?;
-        let mut driver_content = archive.by_name(self.driver_name_in_zip())?;
+        let mut driver_content = archive.by_name(self.driver_name_in_archive())?;
 
-        let driver_path = dir.path().join(self.driver_name_in_zip());
+        let driver_path = dir.path().join(self.driver_name_in_archive());
         let mut driver_file = File::create(&driver_path)?;
         io::copy(&mut driver_content, &mut driver_file)?;
 
