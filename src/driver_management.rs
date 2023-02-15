@@ -1,6 +1,6 @@
 use std::fs::rename;
 
-use anyhow::{bail, Context};
+use anyhow::{bail, Context, Result};
 use tempfile::TempDir;
 
 pub use chromedriver_info::ChromedriverInfo;
@@ -28,7 +28,7 @@ impl<T> WebdriverInfo for T where
 pub async fn download_verify_install(
     driver_info: impl WebdriverInfo,
     max_tries: usize,
-) -> anyhow::Result<()> {
+) -> Result<()> {
     let urls = driver_info.driver_urls(max_tries).await?;
     let url_count = urls.len();
 
