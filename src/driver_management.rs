@@ -3,16 +3,11 @@ use std::fs::rename;
 use anyhow::{bail, Context, Result};
 use tempfile::TempDir;
 
-pub use chromedriver_info::ChromedriverInfo;
-pub use installation_info::WebdriverInstallationInfo;
-pub use url_info::WebdriverUrlInfo;
-pub use verification_info::WebdriverVerificationInfo;
+pub use structs::ChromedriverInfo;
+pub use traits::{WebdriverInstallationInfo, WebdriverUrlInfo, WebdriverVerificationInfo};
 
-mod binary_major_version_hint_url_info;
-mod chromedriver_info;
-mod installation_info;
-mod url_info;
-mod verification_info;
+mod structs;
+mod traits;
 
 /// Information required to download, verify, install driver.
 pub trait WebdriverInfo:

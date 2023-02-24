@@ -9,9 +9,7 @@ use regex::Regex;
 use semver::Version;
 use serde_json::json;
 
-use crate::driver_management::binary_major_version_hint_url_info::{
-    BinaryMajorVersionHintUrlInfo, VersionUrl,
-};
+use crate::driver_management::traits::{BinaryMajorVersionHintUrlInfo, VersionUrl};
 use crate::{WebdriverInstallationInfo, WebdriverVerificationInfo};
 
 /// Information required to implement [WebdriverInfo](crate::WebdriverInfo) for Chromedriver.
