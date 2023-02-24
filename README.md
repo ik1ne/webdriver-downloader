@@ -27,7 +27,7 @@ use webdriver_downloader::{download_verify_install, ChromedriverInfo};
 #[tokio::main]
 async fn main() {
     let driver_info = ChromedriverInfo::new(
-        PathBuf::from(r"./webdrivers/chromedriver.exe"),
+        PathBuf::from("./webdrivers/chromedriver.exe"),
         PathBuf::from("C:/Program Files/Google/Chrome/Application/chrome.exe"),
     );
 
