@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader-cli"
-version = "0.2.4"
+version = "0.3.0"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Cli Interface for webdriver download."
@@ -10,6 +10,10 @@ license = "MIT"
 readme = "../README.md"
 keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", ]
 categories = ["command-line-utilities", "web-programming"]
+
+[[bin]]
+name = "webdriver-downloader"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1"
@@ -24,5 +28,5 @@ reqwest = "0.11"
 regex = "1"
 tempfile = "3"
 tokio = { version = "1", features = ["macros", "process", "rt-multi-thread", ] }
-webdriver-downloader = { path = "../webdriver-downloader" }
+webdriver-downloader = { version = "0.3.0", path = "../webdriver-downloader" }
 zip = "0.6"

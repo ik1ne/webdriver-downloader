@@ -6,6 +6,9 @@ Cli Interface&amp;Library for webdriver download.
 ### CLI
 
 ```shell
+# Install webdriver-downloader-cli
+cargo install webdriver-downloader-cli
+
 # Installs chromedriver into %USERPROFILE%/bin/chromedriver.exe
 webdriver-downlod.exe
 
