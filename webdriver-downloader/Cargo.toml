@@ -1,0 +1,27 @@
+[package]
+name = "webdriver-downloader"
+version = "0.2.3"
+edition = "2021"
+authors = ["ik1ne <ik1ne@naver.com>"]
+description = "Cli Interface for webdriver download."
+repository = "https://github.com/ik1ne/webdriver-downloader"
+homepage = "https://github.com/ik1ne/webdriver-downloader"
+license = "MIT"
+readme = "README.md"
+keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", ]
+categories = ["web-programming"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+fantoccini = "0.19"
+lenient_semver = "0.4"
+semver = "1"
+serde_json = "1"
+reqwest = "0.11"
+regex = "1"
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "process", "rt-multi-thread", ] }
+zip = "0.6"

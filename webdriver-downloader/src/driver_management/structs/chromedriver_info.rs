@@ -84,8 +84,9 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
         let capabilities_value = json!( {
             "goog:chromeOptions":  {
-                "binary": self.browser_path
-            }
+                "binary": self.browser_path,
+                "args": ["-headless"],
+            },
         });
 
         if let serde_json::Value::Object(capabilities) = capabilities_value {
