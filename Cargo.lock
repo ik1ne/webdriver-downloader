@@ -1442,7 +1442,7 @@ dependencies = [
 
 [[package]]
 name = "webdriver-downloader"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1453,28 +1453,18 @@ dependencies = [
  "semver",
  "serde_json",
  "tempfile",
- "tokio",
  "zip",
 ]
 
 [[package]]
 name = "webdriver-downloader-cli"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
- "async-trait",
  "clap",
- "fantoccini",
  "home",
- "lenient_semver",
- "regex",
- "reqwest",
- "semver",
- "serde_json",
- "tempfile",
  "tokio",
  "webdriver-downloader",
- "zip",
 ]
 
 [[package]]

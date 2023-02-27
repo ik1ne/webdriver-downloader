@@ -1,10 +1,21 @@
 use std::ffi::OsStr;
 use std::path::Path;
+use std::process::Child;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
+
+struct ChildGuard(Child);
+
+impl Drop for ChildGuard {
+    fn drop(&mut self) {
+        if let Err(e) = self.0.kill() {
+            eprintln!("Failed to kill child process: {}", e);
+        }
+    }
+}
 
 /// Provides information for verifying a webdriver.
 #[async_trait]
@@ -15,10 +26,11 @@ pub trait WebdriverVerificationInfo {
 
     /// Verifies driver using [test_client](WebdriverVerificationInfo::test_client).
     async fn verify_driver<P: AsRef<Path> + Sync>(&self, driver_path: &P) -> Result<()> {
-        let _driver_command = tokio::process::Command::new(OsStr::new(driver_path.as_ref()))
-            .arg("--port=4444")
-            .kill_on_drop(true)
-            .spawn()?;
+        let _child = ChildGuard(
+            std::process::Command::new(OsStr::new(driver_path.as_ref()))
+                .arg("--port=4444")
+                .spawn()?,
+        );
 
         let client;
         if let Some(capabilities) = self.driver_capabilities() {
