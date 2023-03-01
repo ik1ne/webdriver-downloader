@@ -12,6 +12,9 @@ use serde_json::json;
 use crate::driver_management::traits::{BinaryMajorVersionHintUrlInfo, VersionUrl};
 use crate::{WebdriverInstallationInfo, WebdriverVerificationInfo};
 
+use os_specific_const::*;
+mod os_specific_const;
+
 /// Information required to implement [WebdriverInfo](crate::WebdriverInfo) for Chromedriver.
 pub struct ChromedriverInfo {
     driver_install_path: PathBuf,
@@ -48,7 +51,7 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
         let xml = reqwest::get(download_xml).await?.text().await?;
 
         let re =
-            Regex::new(r"<Key>(.*?)/chromedriver_win32.zip</Key>").expect("Failed to parse regex.");
+            Regex::new(ZIPFILE_NAME_RE).expect("Failed to parse regex.");
 
         let mut versions: Vec<_> = re
             .captures_iter(&xml)
@@ -60,15 +63,13 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
         Ok(versions
             .into_iter()
             .map(|(version_string, version)| VersionUrl {
-                url: format!(
-                    "https://chromedriver.storage.googleapis.com/{}/chromedriver_win32.zip",
-                    version_string
-                ),
+                url: build_url(&version_string),
                 driver_version: version,
             })
             .collect())
     }
 }
+
 
 impl WebdriverInstallationInfo for ChromedriverInfo {
     fn driver_install_path(&self) -> &Path {
@@ -76,7 +77,7 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
     }
 
     fn driver_name_in_archive(&self) -> &'static str {
-        "chromedriver.exe"
+        DRIVER_NAME_IN_ARCHIVE
     }
 }
 
