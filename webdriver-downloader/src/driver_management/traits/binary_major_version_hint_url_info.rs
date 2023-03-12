@@ -14,10 +14,10 @@ pub struct VersionUrl {
 
 #[async_trait]
 pub trait BinaryMajorVersionHintUrlInfo: WebdriverUrlInfo {
-    /// Version hint. used by [compare_version](BinaryMajorVersionHintUrlInfo::driver_urls).
+    /// Version hint. Used by [`BinaryMajorVersionHintUrlInfo::compare_version`].
     fn binary_version(&self) -> Option<Version>;
 
-    /// Compares versions based on `version_hint`.
+    /// Compares versions based on `binary_version`.
     /// Prioritizes same major version to version_hint, and then latest version.
     fn compare_version(version_hint: &Version, left: &Version, right: &Version) -> Ordering {
         let left_match = version_hint.major == left.major;
