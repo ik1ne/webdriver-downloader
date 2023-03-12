@@ -6,8 +6,8 @@ use tempfile::TempDir;
 pub use structs::ChromedriverInfo;
 pub use traits::{WebdriverInstallationInfo, WebdriverUrlInfo, WebdriverVerificationInfo};
 
-mod structs;
-mod traits;
+pub mod structs;
+pub mod traits;
 
 /// Information required to download, verify, install driver.
 pub trait WebdriverInfo:

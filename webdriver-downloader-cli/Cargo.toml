@@ -21,3 +21,8 @@ clap = { version = "4", features = ["cargo", "string", ] }
 home = "0.5"
 tokio = { version = "1", features = ["macros", "process", "rt-multi-thread", ] }
 webdriver-downloader = { version = "0.3", path = "../webdriver-downloader" }
+
+[dev-dependencies]
+assert_cmd = "2"
+assert_fs = "1"
+predicates = "2"
