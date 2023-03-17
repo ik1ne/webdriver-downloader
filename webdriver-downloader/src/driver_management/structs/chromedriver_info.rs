@@ -70,7 +70,6 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
     }
 }
 
-
 impl WebdriverInstallationInfo for ChromedriverInfo {
     fn driver_install_path(&self) -> &Path {
         &self.driver_install_path

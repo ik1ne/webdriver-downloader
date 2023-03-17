@@ -22,8 +22,6 @@ pub(self) enum DriverType {
     Gecko,
 }
 
-
-
 impl DriverType {
     fn default_driver_install_path(&self) -> Result<PathBuf> {
         match home::home_dir() {
@@ -65,8 +63,25 @@ impl DriverType {
 
     fn default_browser_path(&self) -> PathBuf {
         match self {
+            DriverType::Chrome => PathBuf::from(r"/bin/google-chrome-stable"),
+            DriverType::Gecko => todo!("Geckodriver is not implemented yet."),
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+impl DriverType {
+    fn driver_executable_name(&self) -> &'static str {
+        match self {
+            DriverType::Chrome => "chromedriver",
+            DriverType::Gecko => "geckodriver",
+        }
+    }
+
+    fn default_browser_path(&self) -> PathBuf {
+        match self {
             DriverType::Chrome => {
-                PathBuf::from(r"/bin/google-chrome-stable")
+                PathBuf::from(r"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
             }
             DriverType::Gecko => todo!("Geckodriver is not implemented yet."),
         }

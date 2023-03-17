@@ -6,7 +6,7 @@ use predicates::prelude::*;
 
 #[cfg(target_os = "windows")]
 const CHROMEDRIVER_BIN: &str = "chromedriver.exe";
-#[cfg(target_os = "linux")]
+#[cfg(unix)]
 const CHROMEDRIVER_BIN: &str = "chromedriver";
 
 #[test]

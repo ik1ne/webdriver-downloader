@@ -34,6 +34,20 @@ pub trait WebdriverInstallationInfo {
         let mut driver_file = File::create(&driver_path)?;
         io::copy(&mut driver_content, &mut driver_file)?;
 
+        #[cfg(unix)]
+        add_execute_permission(&driver_path)?;
+
         Ok(driver_path)
     }
+}
+
+#[cfg(unix)]
+fn add_execute_permission(path: &Path) -> Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+
+    let mut permissions = path.metadata()?.permissions();
+    permissions.set_mode(0o755);
+    std::fs::set_permissions(path, permissions)?;
+
+    Ok(())
 }
