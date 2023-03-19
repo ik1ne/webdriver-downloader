@@ -2,17 +2,18 @@ use std::borrow::Borrow;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use regex::Regex;
 use semver::Version;
 use serde_json::json;
 
+use os_specific_const::*;
+
 use crate::driver_management::traits::{BinaryMajorVersionHintUrlInfo, VersionUrl};
 use crate::{WebdriverInstallationInfo, WebdriverVerificationInfo};
 
-use os_specific_const::*;
 mod os_specific_const;
 
 /// Information required to implement [WebdriverInfo](crate::WebdriverInfo) for Chromedriver.
@@ -50,13 +51,17 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
 
         let xml = reqwest::get(download_xml).await?.text().await?;
 
-        let re =
-            Regex::new(ZIPFILE_NAME_RE).expect("Failed to parse regex.");
+        let re = Regex::new(ZIPFILE_NAME_RE).expect("Failed to parse regex.");
 
-        let mut versions: Vec<_> = re
-            .captures_iter(&xml)
-            .filter_map(|x| Some((x[1].to_owned(), lenient_semver::parse(&x[1]).ok()?)))
-            .collect();
+        let mut versions = vec![];
+        for capture in re.captures_iter(&xml) {
+            let version_string = capture.get(1).map_or("", |s| s.as_str()).to_string();
+            let version = lenient_semver::parse(&version_string)
+                .map_err(|e| e.owned())
+                .with_context(|| format!("Failed to parse version: \"{}\"", version_string))?;
+
+            versions.push((version_string, version));
+        }
 
         versions.sort_by(|l, r| l.1.cmp(&r.1).reverse());
 
