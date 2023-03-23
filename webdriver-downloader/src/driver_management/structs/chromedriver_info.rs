@@ -1,5 +1,3 @@
-use std::borrow::Borrow;
-use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
@@ -9,12 +7,10 @@ use regex::Regex;
 use semver::Version;
 use serde_json::json;
 
-use os_specific_const::*;
-
 use crate::driver_management::traits::{BinaryMajorVersionHintUrlInfo, VersionUrl};
 use crate::{WebdriverInstallationInfo, WebdriverVerificationInfo};
 
-mod os_specific_const;
+mod os_specific;
 
 /// Information required to implement [WebdriverInfo](crate::WebdriverInfo) for Chromedriver.
 pub struct ChromedriverInfo {
@@ -33,36 +29,8 @@ impl ChromedriverInfo {
 
 #[async_trait]
 impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
-    #[cfg(target_family = "windows")]
     fn binary_version(&self) -> Option<Version> {
-        let mut child = std::process::Command::new("powershell");
-
-        let mut command = OsString::from("(Get-Item \"");
-        command.push(&self.browser_path);
-        command.push("\").VersionInfo.FileVersion");
-
-        child.arg("-command").arg(command);
-
-        let output = child.output().ok()?;
-        lenient_semver::parse(String::from_utf8_lossy(&output.stdout).borrow()).ok()
-    }
-
-    #[cfg(target_family = "unix")]
-    fn binary_version(&self) -> Option<Version> {
-        let re = Regex::new(r"([0-9\.]+)").expect("Failed to parse regex.");
-        let output = std::process::Command::new(&self.browser_path)
-            .arg(Path::new("--version"))
-            .output()
-            .ok()?;
-
-        let chrome_version_string = String::from_utf8_lossy(&output.stdout);
-        let version_string = re.captures_iter(&chrome_version_string)
-            .next()?
-            .get(1)?
-            .as_str()
-            .to_string();
-
-        lenient_semver::parse(&version_string).ok()
+        os_specific::binary_version(&self.browser_path)
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>> {
@@ -70,7 +38,7 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
 
         let xml = reqwest::get(download_xml).await?.text().await?;
 
-        let re = Regex::new(ZIPFILE_NAME_RE).expect("Failed to parse regex.");
+        let re = Regex::new(os_specific::ZIPFILE_NAME_RE).expect("Failed to parse regex.");
 
         let mut versions = vec![];
         for capture in re.captures_iter(&xml) {
@@ -87,7 +55,7 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
         Ok(versions
             .into_iter()
             .map(|(version_string, version)| VersionUrl {
-                url: build_url(&version_string),
+                url: os_specific::build_url(&version_string),
                 driver_version: version,
             })
             .collect())
@@ -100,7 +68,7 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
     }
 
     fn driver_name_in_archive(&self) -> &'static str {
-        DRIVER_NAME_IN_ARCHIVE
+        os_specific::DRIVER_NAME_IN_ARCHIVE
     }
 }
 
