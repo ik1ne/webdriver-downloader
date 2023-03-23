@@ -88,3 +88,26 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::traits::BinaryMajorVersionHintUrlInfo;
+    use crate::ChromedriverInfo;
+
+    #[test]
+    fn test_get_binary_version() {
+        #[cfg(target_os = "windows")]
+        let browser_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe";
+        #[cfg(target_os = "linux")]
+        let browser_path = "/usr/bin/google-chrome";
+        #[cfg(target_os = "macos")]
+        let browser_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+
+        let chromedriver_info = ChromedriverInfo {
+            driver_install_path: "".into(),
+            browser_path: browser_path.into(),
+        };
+
+        assert!(chromedriver_info.binary_version().is_some());
+    }
+}
