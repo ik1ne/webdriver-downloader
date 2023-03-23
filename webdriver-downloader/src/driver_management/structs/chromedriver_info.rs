@@ -33,6 +33,7 @@ impl ChromedriverInfo {
 
 #[async_trait]
 impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
+    #[cfg(target_family = "windows")]
     fn binary_version(&self) -> Option<Version> {
         let mut child = std::process::Command::new("powershell");
 
@@ -44,6 +45,24 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
 
         let output = child.output().ok()?;
         lenient_semver::parse(String::from_utf8_lossy(&output.stdout).borrow()).ok()
+    }
+
+    #[cfg(target_family = "unix")]
+    fn binary_version(&self) -> Option<Version> {
+        let re = Regex::new(r"([0-9\.]+)").expect("Failed to parse regex.");
+        let output = std::process::Command::new(&self.browser_path)
+            .arg(Path::new("--version"))
+            .output()
+            .ok()?;
+
+        let chrome_version_string = String::from_utf8_lossy(&output.stdout);
+        let version_string = re.captures_iter(&chrome_version_string)
+            .next()?
+            .get(1)?
+            .as_str()
+            .to_string();
+
+        lenient_semver::parse(&version_string).ok()
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>> {
