@@ -1,7 +1,7 @@
 use std::ffi::OsStr;
 use std::ops::{Deref, DerefMut};
 use std::path::Path;
-use std::process::{Child, Stdio};
+use std::process::Child;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
@@ -102,7 +102,7 @@ fn get_random_available_port() -> u16 {
 #[cfg(test)]
 mod tests {
     use super::get_random_available_port;
-    use std::net::{TcpListener, TcpStream};
+    use std::net::TcpListener;
 
     #[test]
     fn test_get_random_available_port() {
