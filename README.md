@@ -25,7 +25,8 @@ webdriver-download.exe --mkdir --driver ./drivers/chromedriver_dev.exe --browser
 ```rust
 use std::path::PathBuf;
 
-use webdriver_downloader::{download_verify_install, ChromedriverInfo};
+use webdriver_downloader::download_verify_install;
+use webdriver_downloader::structs::ChromedriverInfo;
 
 #[tokio::main]
 async fn main() {
