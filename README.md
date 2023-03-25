@@ -1,5 +1,5 @@
 # webdriver-downloader
-Cli Interface&amp;Library for webdriver download.
+Cli Interface&amp;Library for webdriver download. Supports chromedriver for Windows, Linux and MacOS.
 
 ## Usage
 
@@ -9,7 +9,7 @@ Cli Interface&amp;Library for webdriver download.
 # Install webdriver-downloader-cli
 cargo install webdriver-downloader-cli
 
-# Installs chromedriver into %USERPROFILE%/bin/chromedriver.exe
+# Installs chromedriver into %USERPROFILE%/bin/chromedriver.exe ($HOME/bin/chromedriver for unix family)
 webdriver-downlod.exe
 
 # You can specify path to install driver to. Adding mkdir flag will create the parent directiry.
