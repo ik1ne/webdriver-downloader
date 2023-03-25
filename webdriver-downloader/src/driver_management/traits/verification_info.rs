@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::ops::{Deref, DerefMut};
 use std::path::Path;
 use std::process::Child;
+use std::thread;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
@@ -61,6 +62,8 @@ pub trait WebdriverVerificationInfo {
                 .arg(&format!("--port={}", port))
                 .spawn()?,
         );
+
+        thread::sleep(std::time::Duration::from_millis(500));
 
         let client;
         if let Some(capabilities) = self.driver_capabilities() {
