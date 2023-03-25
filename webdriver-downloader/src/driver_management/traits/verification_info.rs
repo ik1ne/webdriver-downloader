@@ -2,7 +2,6 @@ use std::ffi::OsStr;
 use std::path::Path;
 use std::process::Child;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
@@ -12,9 +11,21 @@ struct ChildGuard(Child);
 impl Drop for ChildGuard {
     fn drop(&mut self) {
         if let Err(e) = self.0.kill() {
-            eprintln!("Failed to kill child process: {}", e);
+            println!("Failed to kill child process: {}", e);
         }
     }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum VerificationError {
+    #[error("Failed to start driver: {0}")]
+    Start(#[from] std::io::Error),
+    #[error("Failed to connect to driver: {0}")]
+    Connect(#[from] fantoccini::error::NewSessionError),
+    #[error("Driver test failed to pass: {0}")]
+    Navigate(#[from] fantoccini::error::CmdError),
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
 }
 
 /// Provides information for verifying a webdriver.
@@ -25,7 +36,10 @@ pub trait WebdriverVerificationInfo {
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
     /// Verifies driver using [test_client](WebdriverVerificationInfo::test_client).
-    async fn verify_driver<P: AsRef<Path> + Sync>(&self, driver_path: &P) -> Result<()> {
+    async fn verify_driver<P: AsRef<Path> + Sync>(
+        &self,
+        driver_path: &P,
+    ) -> Result<(), VerificationError> {
         let _child = ChildGuard(
             std::process::Command::new(OsStr::new(driver_path.as_ref()))
                 .arg("--port=4444")
@@ -46,11 +60,14 @@ pub trait WebdriverVerificationInfo {
 
         let test_result = Self::test_client(&client).await;
 
-        let _ = client.close().await;
+        if let Err(e) = client.close().await {
+            println!("Failed to close client: {}", e);
+        }
+
         test_result
     }
 
-    async fn test_client(client: &fantoccini::Client) -> Result<()> {
+    async fn test_client(client: &fantoccini::Client) -> Result<(), VerificationError> {
         client.goto("https://www.example.com").await?;
         client.find(Locator::Css("html")).await?;
 

@@ -1,10 +1,10 @@
-use std::fs::rename;
+use std::{fs, io};
 
-use anyhow::{bail, Context, Result};
 use tempfile::TempDir;
 
-pub use structs::ChromedriverInfo;
-pub use traits::{WebdriverInstallationInfo, WebdriverUrlInfo, WebdriverVerificationInfo};
+use crate::traits::installation_info::{InstallationError, WebdriverInstallationInfo};
+use crate::traits::url_info::{UrlError, WebdriverUrlInfo};
+use crate::traits::verification_info::{VerificationError, WebdriverVerificationInfo};
 
 pub mod structs;
 pub mod traits;
@@ -20,26 +20,45 @@ impl<T> WebdriverInfo for T where
 {
 }
 
+#[derive(thiserror::Error, Debug)]
+pub enum WebdriverDownloadError {
+    #[error(transparent)]
+    Url(#[from] UrlError),
+    #[error(transparent)]
+    Install(#[from] InstallationError),
+    #[error(transparent)]
+    Verify(#[from] VerificationError),
+    #[error("Failed to move driver to driver_path: {0}")]
+    Move(#[from] io::Error),
+    #[error("Tried {0} possible versions, but no version passed verification.")]
+    NoVersionPassedVerification(usize),
+}
+
 pub async fn download_verify_install(
     driver_info: impl WebdriverInfo,
     max_tries: usize,
-) -> Result<()> {
+) -> Result<(), WebdriverDownloadError> {
     let urls = driver_info.driver_urls(max_tries).await?;
     let url_count = urls.len();
 
     for url in urls {
+        println!("Trying url: {:?}.", url);
         let tempdir = TempDir::new()?;
 
         let temp_driver_path = driver_info.download_in_tempdir(url, &tempdir).await?;
 
-        if driver_info.verify_driver(&temp_driver_path).await.is_ok() {
-            return rename(temp_driver_path, driver_info.driver_install_path())
-                .with_context(|| "Failed to install driver to driver_path.");
+        match driver_info.verify_driver(&temp_driver_path).await {
+            Ok(_) => {
+                fs::rename(temp_driver_path, driver_info.driver_install_path())?;
+                return Ok(());
+            }
+            Err(e) => {
+                println!("Verification failed: {}.", e)
+            }
         }
     }
 
-    bail!(
-        "Tried {} possible versions, but no version passed verification.",
-        url_count
-    )
+    Err(WebdriverDownloadError::NoVersionPassedVerification(
+        url_count,
+    ))
 }

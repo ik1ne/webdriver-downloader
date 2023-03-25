@@ -1,12 +1,11 @@
-use anyhow::Result;
-
-use webdriver_downloader::*;
+use webdriver_downloader::download_verify_install;
+use webdriver_downloader::structs::ChromedriverInfo;
 
 use super::build_arg::*;
 use super::check_arg::*;
 use super::*;
 
-pub async fn run() -> Result<()> {
+pub async fn run() -> anyhow::Result<()> {
     let args = get_args()?;
 
     check_driver_install_path(&args.driver_install_path, args.mkdir)?;
@@ -16,7 +15,8 @@ pub async fn run() -> Result<()> {
         DriverType::Chrome => {
             let driver_info = ChromedriverInfo::new(args.driver_install_path, args.browser_path);
 
-            download_verify_install(driver_info, 5).await
+            download_verify_install(driver_info, 5).await?;
+            Ok(())
         }
         DriverType::Gecko => todo!("Geckodriver is not implemented yet."),
     }

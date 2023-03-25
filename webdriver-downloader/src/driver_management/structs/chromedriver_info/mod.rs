@@ -1,14 +1,18 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::Context;
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use regex::Regex;
 use semver::Version;
 use serde_json::json;
 
-use crate::driver_management::traits::{BinaryMajorVersionHintUrlInfo, VersionUrl};
-use crate::{WebdriverInstallationInfo, WebdriverVerificationInfo};
+use crate::traits::binary_major_version_hint_url_info::{
+    BinaryMajorVersionHintUrlInfo, BinaryVersionError, VersionUrl,
+};
+use crate::traits::installation_info::WebdriverInstallationInfo;
+use crate::traits::url_info::UrlError;
+use crate::traits::verification_info::WebdriverVerificationInfo;
 
 mod os_specific;
 
@@ -29,11 +33,11 @@ impl ChromedriverInfo {
 
 #[async_trait]
 impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
-    fn binary_version(&self) -> Option<Version> {
+    fn binary_version(&self) -> Result<Version, BinaryVersionError> {
         os_specific::binary_version(&self.browser_path)
     }
 
-    async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>> {
+    async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>, UrlError> {
         let download_xml = "https://chromedriver.storage.googleapis.com";
 
         let xml = reqwest::get(download_xml).await?.text().await?;
@@ -91,8 +95,8 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
 
 #[cfg(test)]
 mod tests {
-    use crate::traits::BinaryMajorVersionHintUrlInfo;
-    use crate::ChromedriverInfo;
+    use crate::structs::ChromedriverInfo;
+    use crate::traits::binary_major_version_hint_url_info::BinaryMajorVersionHintUrlInfo;
 
     #[test]
     fn test_get_binary_version() {
@@ -108,6 +112,6 @@ mod tests {
             browser_path: browser_path.into(),
         };
 
-        assert!(chromedriver_info.binary_version().is_some());
+        assert!(chromedriver_info.binary_version().is_ok());
     }
 }
