@@ -1,6 +1,7 @@
 use std::ffi::OsStr;
+use std::ops::{Deref, DerefMut};
 use std::path::Path;
-use std::process::Child;
+use std::process::{Child, Stdio};
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
@@ -13,6 +14,20 @@ impl Drop for ChildGuard {
         if let Err(e) = self.0.kill() {
             println!("Failed to kill child process: {}", e);
         }
+    }
+}
+
+impl Deref for ChildGuard {
+    type Target = Child;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for ChildGuard {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -40,9 +55,10 @@ pub trait WebdriverVerificationInfo {
         &self,
         driver_path: &P,
     ) -> Result<(), VerificationError> {
+        let port = get_random_available_port();
         let _child = ChildGuard(
             std::process::Command::new(OsStr::new(driver_path.as_ref()))
-                .arg("--port=4444")
+                .arg(&format!("--port={}", port))
                 .spawn()?,
         );
 
@@ -50,11 +66,11 @@ pub trait WebdriverVerificationInfo {
         if let Some(capabilities) = self.driver_capabilities() {
             client = fantoccini::ClientBuilder::native()
                 .capabilities(capabilities)
-                .connect("http://localhost:4444")
+                .connect(&format!("http://localhost:{}", port))
                 .await?;
         } else {
             client = fantoccini::ClientBuilder::native()
-                .connect("http://localhost:4444")
+                .connect(&format!("http://localhost:{}", port))
                 .await?;
         }
 
@@ -72,5 +88,35 @@ pub trait WebdriverVerificationInfo {
         client.find(Locator::Css("html")).await?;
 
         Ok(())
+    }
+}
+
+fn get_random_available_port() -> u16 {
+    use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener};
+
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 0);
+    let listener = TcpListener::bind(addr).unwrap();
+    listener.local_addr().unwrap().port()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::get_random_available_port;
+    use std::net::{TcpListener, TcpStream};
+
+    #[test]
+    fn test_get_random_available_port() {
+        let port = get_random_available_port();
+
+        // Check if the port number is within the valid range
+        assert!(port > 0, "Port number should be within the valid range");
+
+        // Check if the port is actually available
+        let addr = format!("127.0.0.1:{}", port);
+        let listener_result = TcpListener::bind(addr);
+        assert!(
+            listener_result.is_ok(),
+            "Port number should be available for binding"
+        );
     }
 }
