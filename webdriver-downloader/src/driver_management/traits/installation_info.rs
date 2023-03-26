@@ -1,3 +1,4 @@
+use std::fs;
 use std::fs::File;
 use std::io::{self, Cursor};
 use std::path::{Path, PathBuf};
@@ -31,7 +32,7 @@ pub trait WebdriverInstallationInfo {
     fn driver_name_in_archive(&self) -> &'static str;
 
     /// Downloads url and extracts the driver inside tempdir.
-    async fn download_in_tempdir<U: IntoUrl + Send>(
+    async fn download_in_tempdir<U: 'static + IntoUrl + Send>(
         &self,
         url: U,
         dir: &TempDir,
@@ -51,6 +52,13 @@ pub trait WebdriverInstallationInfo {
         add_execute_permission(&driver_path)?;
 
         Ok(driver_path)
+    }
+
+    fn install_driver<P: AsRef<Path> + 'static>(
+        &self,
+        temp_driver_path: &P,
+    ) -> Result<(), InstallationError> {
+        fs::rename(temp_driver_path, self.driver_install_path()).map_err(|e| e.into())
     }
 }
 
