@@ -37,7 +37,7 @@ pub trait WebdriverVerificationInfo {
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
     /// Verifies driver using [test_client](WebdriverVerificationInfo::test_client).
-    async fn verify_driver<P: AsRef<Path> + Sync>(
+    async fn verify_driver<P: AsRef<Path> + Sync + 'static>(
         &self,
         driver_path: &P,
     ) -> Result<(), VerificationError> {
@@ -89,8 +89,9 @@ fn get_random_available_port() -> u16 {
 
 #[cfg(test)]
 mod tests {
-    use super::get_random_available_port;
     use std::net::TcpListener;
+
+    use super::get_random_available_port;
 
     #[test]
     fn test_get_random_available_port() {
