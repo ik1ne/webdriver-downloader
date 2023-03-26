@@ -1,5 +1,4 @@
 use std::ffi::OsStr;
-use std::ops::{Deref, DerefMut};
 use std::path::Path;
 use std::process::Child;
 use std::thread;
@@ -8,27 +7,13 @@ use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
 
-struct ChildGuard(Child);
+struct ChildGuard(pub Child);
 
 impl Drop for ChildGuard {
     fn drop(&mut self) {
         if let Err(e) = self.0.kill() {
             println!("Failed to kill child process: {}", e);
         }
-    }
-}
-
-impl Deref for ChildGuard {
-    type Target = Child;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for ChildGuard {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 
