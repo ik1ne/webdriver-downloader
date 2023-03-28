@@ -16,6 +16,7 @@ jobs:
 
     steps:
     - uses: browser-actions/setup-chrome@v1
+    - uses: actions/checkout@v2
     - run: chrome --version
     - name: Build
       run: cargo build --verbose
