@@ -1,15 +1,12 @@
 use std::cmp::Ordering;
+use std::collections::BTreeMap;
 
 use async_trait::async_trait;
 use semver::Version;
 
-use super::url_info::{UrlError, WebdriverUrlInfo};
+use crate::common::url_info::VersionUrl;
 
-#[derive(Eq, PartialEq, Debug, Clone)]
-pub struct VersionUrl {
-    pub driver_version: Version,
-    pub url: String,
-}
+use super::url_info::{UrlError, WebdriverUrlInfo};
 
 #[derive(thiserror::Error, Debug)]
 pub enum BinaryVersionError {
@@ -23,9 +20,11 @@ pub enum BinaryVersionError {
     Other(#[from] anyhow::Error),
 }
 
+/// Provides information for determining which url to download.
+/// This trait uses the binary version to sort the urls to download.
 #[async_trait]
-pub trait BinaryMajorVersionHintUrlInfo: WebdriverUrlInfo {
-    /// Version hint. Used by [`BinaryMajorVersionHintUrlInfo::compare_version`].
+pub trait BinaryVersionHintUrlInfo: WebdriverUrlInfo {
+    /// Version hint. Used by [`BinaryVersionHintUrlInfo::compare_version`].
     fn binary_version(&self) -> Result<Version, BinaryVersionError>;
 
     /// Compares versions based on `binary_version`.
@@ -47,31 +46,43 @@ pub trait BinaryMajorVersionHintUrlInfo: WebdriverUrlInfo {
 #[async_trait]
 impl<T> WebdriverUrlInfo for T
 where
-    T: BinaryMajorVersionHintUrlInfo + Sync,
+    T: BinaryVersionHintUrlInfo + Sync,
 {
-    async fn driver_urls(&self, limit: usize) -> Result<Vec<String>, UrlError> {
-        let mut url_infos = self.driver_version_urls().await?;
+    async fn version_urls(&self, limit: usize) -> Result<Vec<VersionUrl>, UrlError> {
+        let url_infos = self.driver_version_urls().await?;
 
-        match self.binary_version() {
-            Ok(version_hint) => {
-                url_infos.sort_by(|left, right| {
-                    Self::compare_version(
-                        &version_hint,
-                        &right.driver_version,
-                        &left.driver_version,
-                    )
-                });
-            }
+        let cmp: Box<dyn Fn(&VersionUrl, &VersionUrl) -> Ordering> = match self.binary_version() {
+            Ok(version_hint) => Box::new(move |left: &VersionUrl, right: &VersionUrl| {
+                Self::compare_version(&version_hint, &left.version, &right.version)
+            }),
             Err(e) => {
-                println!("Failed to parse binary version. Falling back to latest version: {}", e);
-                url_infos.sort_by(|left, right| right.driver_version.cmp(&left.driver_version))
+                println!("Failed to parse binary version: {}", e);
+
+                Box::new(|left: &VersionUrl, right: &VersionUrl| left.version.cmp(&right.version))
+            }
+        };
+
+        let mut major_version_map: BTreeMap<u64, VersionUrl> = BTreeMap::new();
+
+        for version_url in url_infos {
+            if let Some(existing_version_url) =
+                major_version_map.get_mut(&version_url.version.major)
+            {
+                if cmp(&version_url, existing_version_url) == Ordering::Greater {
+                    *existing_version_url = version_url;
+                }
+            } else {
+                major_version_map.insert(version_url.version.major, version_url);
             }
         }
 
-        Ok(url_infos
+        let mut keys_descending: Vec<u64> = major_version_map.keys().copied().collect();
+        keys_descending.reverse();
+
+        Ok(keys_descending
             .into_iter()
+            .filter_map(|key| major_version_map.remove(&key))
             .take(limit)
-            .map(|version_url| version_url.url)
             .collect())
     }
 }
@@ -83,10 +94,10 @@ mod tests {
     use async_trait::async_trait;
     use semver::Version;
 
-    use crate::traits::binary_major_version_hint_url_info::{
-        BinaryMajorVersionHintUrlInfo, BinaryVersionError, VersionUrl,
+    use crate::common::binary_version_hint_url_info::{
+        BinaryVersionError, BinaryVersionHintUrlInfo, VersionUrl,
     };
-    use crate::traits::url_info::{UrlError, WebdriverUrlInfo};
+    use crate::common::url_info::{UrlError, WebdriverUrlInfo};
 
     struct MockBinaryMajorVersionHintUrlInfo {
         version_hint: Option<Version>,
@@ -94,7 +105,7 @@ mod tests {
     }
 
     #[async_trait]
-    impl BinaryMajorVersionHintUrlInfo for MockBinaryMajorVersionHintUrlInfo {
+    impl BinaryVersionHintUrlInfo for MockBinaryMajorVersionHintUrlInfo {
         fn binary_version(&self) -> Result<Version, BinaryVersionError> {
             self.version_hint
                 .clone()
@@ -108,12 +119,9 @@ mod tests {
         }
     }
 
-    fn create_dummy_version_info(driver_version: Version) -> VersionUrl {
-        let url = driver_version.to_string();
-        VersionUrl {
-            driver_version,
-            url,
-        }
+    fn create_dummy_version_info(version: Version) -> VersionUrl {
+        let url = version.to_string();
+        VersionUrl { version, url }
     }
 
     #[test]
@@ -141,11 +149,11 @@ mod tests {
             version_urls,
         };
         assert_eq!(
-            mock_info.driver_urls(5).await.unwrap(),
+            mock_info.version_urls(5).await.unwrap(),
             vec![
-                "3.0.0".to_string(),
-                "2.0.0".to_string(),
-                "1.0.0".to_string(),
+                create_dummy_version_info(Version::new(3, 0, 0)),
+                create_dummy_version_info(Version::new(2, 0, 0)),
+                create_dummy_version_info(Version::new(1, 0, 0)),
             ]
         )
     }
@@ -164,8 +172,11 @@ mod tests {
         };
 
         assert_eq!(
-            mock_info.driver_urls(2).await.unwrap(),
-            vec!["3.0.0".to_string(), "2.0.0".to_string(),]
+            mock_info.version_urls(2).await.unwrap(),
+            vec![
+                create_dummy_version_info(Version::new(3, 0, 0)),
+                create_dummy_version_info(Version::new(2, 0, 0)),
+            ]
         )
     }
 }

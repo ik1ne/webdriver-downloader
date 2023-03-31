@@ -3,12 +3,12 @@ use std::io;
 use async_trait::async_trait;
 use tempfile::TempDir;
 
-use crate::traits::installation_info::{InstallationError, WebdriverInstallationInfo};
-use crate::traits::url_info::{UrlError, WebdriverUrlInfo};
-use crate::traits::verification_info::{VerificationError, WebdriverVerificationInfo};
+use crate::common::installation_info::{InstallationError, WebdriverInstallationInfo};
+use crate::common::url_info::{UrlError, WebdriverUrlInfo};
+use crate::common::verification_info::{VerificationError, WebdriverVerificationInfo};
 
-pub mod structs;
-pub mod traits;
+pub mod driver_impls;
+pub mod common;
 
 /// Information required to download, verify, install driver.
 #[async_trait]
@@ -44,14 +44,14 @@ where
         &self,
         max_tries: usize,
     ) -> Result<(), WebdriverDownloadError> {
-        let urls = self.driver_urls(max_tries).await?;
-        let url_count = urls.len();
+        let version_urls = self.version_urls(max_tries).await?;
+        let url_count = version_urls.len();
 
-        for url in urls {
-            println!("Trying url: {:?}.", url);
+        for version_url in version_urls {
+            println!("Trying url for version {}: {}.", version_url.version, version_url.url);
             let tempdir = TempDir::new()?;
 
-            let temp_driver_path = self.download_in_tempdir(url, &tempdir).await?;
+            let temp_driver_path = self.download_in_tempdir(version_url.url, &tempdir).await?;
 
             match self.verify_driver(&temp_driver_path).await {
                 Ok(_) => {
