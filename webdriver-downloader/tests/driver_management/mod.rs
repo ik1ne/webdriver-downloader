@@ -4,6 +4,8 @@ mod tests {
 
     use anyhow::anyhow;
     use mockall::predicate::eq;
+    use semver::Version;
+    use webdriver_downloader::common::url_info::VersionUrl;
 
     use webdriver_downloader::WebdriverInfo;
 
@@ -12,7 +14,7 @@ mod tests {
     #[tokio::test]
     async fn fails_when_0_max_tries() {
         let mut mock = MockWebdriverInfo::new();
-        mock.expect_driver_urls()
+        mock.expect_version_urls()
             .with(eq(0))
             .return_once(|_limit| Ok(vec![]));
         let result = mock.download_verify_install(0).await;
@@ -24,9 +26,13 @@ mod tests {
         let mut mock = MockWebdriverInfo::new();
         let version_count = 5;
 
-        let urls = vec![String::new(); version_count];
+        let dummy_version_url = VersionUrl {
+            version: Version::new(0, 0, 0),
+            url: Default::default(),
+        };
+        let urls = vec![dummy_version_url; version_count];
 
-        mock.expect_driver_urls()
+        mock.expect_version_urls()
             .with(eq(version_count))
             .return_once(|_limit| Ok(urls));
 

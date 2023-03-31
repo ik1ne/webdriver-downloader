@@ -1,6 +1,7 @@
 use async_trait::async_trait;
+use semver::Version;
 
-use crate::traits::binary_major_version_hint_url_info::BinaryVersionError;
+use crate::common::binary_version_hint_url_info::BinaryVersionError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum UrlError {
@@ -12,9 +13,15 @@ pub enum UrlError {
     Other(#[from] anyhow::Error),
 }
 
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct VersionUrl {
+    pub version: Version,
+    pub url: String,
+}
+
 /// Provides information for determining which url to download.
 #[async_trait]
 pub trait WebdriverUrlInfo {
-    /// Lists viable driver urls, up to `limit`.
-    async fn driver_urls(&self, limit: usize) -> Result<Vec<String>, UrlError>;
+    /// Lists viable VersionUrls, up to `limit`.
+    async fn version_urls(&self, limit: usize) -> Result<Vec<VersionUrl>, UrlError>;
 }

@@ -7,12 +7,10 @@ use regex::Regex;
 use semver::Version;
 use serde_json::{json, Map};
 
-use crate::traits::binary_major_version_hint_url_info::{
-    BinaryMajorVersionHintUrlInfo, BinaryVersionError, VersionUrl,
-};
-use crate::traits::installation_info::WebdriverInstallationInfo;
-use crate::traits::url_info::UrlError;
-use crate::traits::verification_info::WebdriverVerificationInfo;
+use crate::common::binary_version_hint_url_info::{BinaryVersionError, BinaryVersionHintUrlInfo};
+use crate::common::installation_info::WebdriverInstallationInfo;
+use crate::common::url_info::{UrlError, VersionUrl};
+use crate::common::verification_info::WebdriverVerificationInfo;
 
 mod os_specific;
 
@@ -32,7 +30,7 @@ impl ChromedriverInfo {
 }
 
 #[async_trait]
-impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
+impl BinaryVersionHintUrlInfo for ChromedriverInfo {
     fn binary_version(&self) -> Result<Version, BinaryVersionError> {
         os_specific::binary_version(&self.browser_path)
     }
@@ -59,8 +57,8 @@ impl BinaryMajorVersionHintUrlInfo for ChromedriverInfo {
         Ok(versions
             .into_iter()
             .map(|(version_string, version)| VersionUrl {
+                version,
                 url: os_specific::build_url(&version_string),
-                driver_version: version,
             })
             .collect())
     }
@@ -93,8 +91,8 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
 
 #[cfg(test)]
 mod tests {
-    use crate::structs::ChromedriverInfo;
-    use crate::traits::binary_major_version_hint_url_info::BinaryMajorVersionHintUrlInfo;
+    use crate::common::binary_version_hint_url_info::BinaryVersionHintUrlInfo;
+    use crate::driver_impls::ChromedriverInfo;
 
     #[test]
     fn test_get_binary_version() {

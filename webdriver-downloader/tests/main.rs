@@ -6,11 +6,11 @@ use mockall::mock;
 use reqwest::IntoUrl;
 use tempfile::TempDir;
 
-use webdriver_downloader::traits::installation_info::{
+use webdriver_downloader::common::installation_info::{
     InstallationError, WebdriverInstallationInfo,
 };
-use webdriver_downloader::traits::url_info::{UrlError, WebdriverUrlInfo};
-use webdriver_downloader::traits::verification_info::{
+use webdriver_downloader::common::url_info::{UrlError, VersionUrl, WebdriverUrlInfo};
+use webdriver_downloader::common::verification_info::{
     VerificationError, WebdriverVerificationInfo,
 };
 mod driver_management;
@@ -21,7 +21,7 @@ mock! {
 
     #[async_trait]
     impl WebdriverUrlInfo for WebdriverInfo {
-        async fn driver_urls(&self, limit: usize) -> Result<Vec<String>, UrlError>;
+        async fn version_urls(&self, limit: usize) -> Result<Vec<VersionUrl>, UrlError>;
     }
 
     #[async_trait]

@@ -3,7 +3,7 @@ use std::path::Path;
 
 use semver::Version;
 
-use crate::structs::chromedriver_info::BinaryVersionError;
+use crate::driver_impls::chromedriver_info::BinaryVersionError;
 
 pub const ZIPFILE_NAME_RE: &str = r"<Key>([0-9\.]*?)/chromedriver_win32.zip</Key>";
 pub const DRIVER_NAME_IN_ARCHIVE: &str = "chromedriver.exe";
