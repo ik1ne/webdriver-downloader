@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use regex::Regex;
 use semver::Version;
-use serde_json::json;
+use serde_json::{json, Map};
 
 use crate::traits::binary_major_version_hint_url_info::{
     BinaryMajorVersionHintUrlInfo, BinaryVersionError, VersionUrl,
@@ -78,18 +78,16 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
 
 impl WebdriverVerificationInfo for ChromedriverInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
-        let capabilities_value = json!( {
-            "goog:chromeOptions":  {
-                "binary": self.browser_path,
-                "args": ["-headless"],
-            },
+        let capabilities_value = json!({
+            "binary": self.browser_path,
+            "args": ["-headless"],
         });
 
-        if let serde_json::Value::Object(capabilities) = capabilities_value {
-            Some(capabilities)
-        } else {
-            panic!("Failed to construct capabilities")
-        }
+        let mut capabilities = Map::new();
+
+        capabilities.insert("goog:chromeOptions".to_string(), capabilities_value);
+
+        Some(capabilities)
     }
 }
 
