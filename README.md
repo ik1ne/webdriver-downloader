@@ -1,5 +1,5 @@
 # webdriver-downloader
-Cli Interface&amp;Library for webdriver download. Supports chromedriver for Windows, Linux and MacOS.
+Cli Interface&amp;Library for webdriver download. Supports chromedriver for Windows, Linux and macOS.
 
 ## Usage
 
@@ -25,7 +25,6 @@ webdriver-download.exe --mkdir --driver ./drivers/chromedriver_dev.exe --browser
 ```rust
 use std::path::PathBuf;
 
-use webdriver_downloader::download_verify_install;
 use webdriver_downloader::structs::ChromedriverInfo;
 
 #[tokio::main]
@@ -36,9 +35,9 @@ async fn main() {
     );
 
     // Tries up to 5 versions of webdrivers.
-    download_verify_install(driver_info, 5).await.unwrap();
+    driver_info.download_verify_install(5).await.unwrap();
 }
 ```
 
 #### Implementing downloader for custom driver
-You can implement trait `WebdriverUrlInfo, WebdriverInstallationInfo, WebdriverVerificationInfo` for CustomDriverInfo and call `download_verify_install(custom_driver_info, max_attempts)`.
+You can implement trait `WebdriverUrlInfo, WebdriverInstallationInfo, WebdriverVerificationInfo` for CustomDriverInfo and call `custom_driver_info.download_verify_install(max_attempts)`.
