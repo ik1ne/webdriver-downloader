@@ -3,7 +3,7 @@ use std::path::Path;
 
 use semver::Version;
 
-use crate::driver_impls::chromedriver_info::BinaryVersionError;
+use crate::driver_impls::chromedriver_info::VersionReqError;
 
 pub const ZIPFILE_NAME_RE: &str = r"<Key>([0-9\.]*?)/chromedriver_win32.zip</Key>";
 pub const DRIVER_NAME_IN_ARCHIVE: &str = "chromedriver.exe";
@@ -15,7 +15,7 @@ pub fn build_url(version_string: &str) -> String {
     )
 }
 
-pub fn binary_version(browser_path: &Path) -> Result<Version, BinaryVersionError> {
+pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let mut child = std::process::Command::new("powershell");
 
     let mut command = OsString::from("(Get-Item \"");

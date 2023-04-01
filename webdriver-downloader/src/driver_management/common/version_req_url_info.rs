@@ -2,36 +2,38 @@ use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
 use async_trait::async_trait;
-use semver::Version;
+use semver::{Version, VersionReq};
 
 use crate::common::url_info::VersionUrl;
 
 use super::url_info::{UrlError, WebdriverUrlInfo};
 
 #[derive(thiserror::Error, Debug)]
-pub enum BinaryVersionError {
+pub enum VersionReqError {
     #[error("Failed to capture regex from string: {0}")]
     RegexError(String),
-    #[error("Failed to parse binary version: {0}")]
-    Parse(#[from] lenient_semver::parser::OwnedError),
+    #[error(transparent)]
+    ParseVersion(#[from] lenient_semver::parser::OwnedError),
     #[error("Failed to execute binary: {0}")]
     Execute(#[from] std::io::Error),
+    #[error(transparent)]
+    ParseVersionReq(#[from] semver::Error),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 
 /// Provides information for determining which url to download.
-/// This trait uses the binary version to sort the urls to download.
+/// This trait uses the version to sort the urls to download.
 #[async_trait]
-pub trait BinaryVersionHintUrlInfo: WebdriverUrlInfo {
-    /// Version hint. Used by [`BinaryVersionHintUrlInfo::compare_version`].
-    fn binary_version(&self) -> Result<Version, BinaryVersionError>;
+pub trait VersionReqUrlInfo: WebdriverUrlInfo {
+    /// Version hint. Used by [`VersionReqUrlInfo::compare_version`].
+    fn version_req(&self) -> Result<VersionReq, VersionReqError>;
 
     /// Compares versions based on `binary_version`.
     /// Prioritizes same major version to version_hint, and then latest version.
-    fn compare_version(version_hint: &Version, left: &Version, right: &Version) -> Ordering {
-        let left_match = version_hint.major == left.major;
-        let right_match = version_hint.major == right.major;
+    fn compare_version(version_hint: &VersionReq, left: &Version, right: &Version) -> Ordering {
+        let left_match = version_hint.matches(left);
+        let right_match = version_hint.matches(right);
         match (left_match, right_match) {
             (true, false) => Ordering::Greater,
             (false, true) => Ordering::Less,
@@ -46,12 +48,12 @@ pub trait BinaryVersionHintUrlInfo: WebdriverUrlInfo {
 #[async_trait]
 impl<T> WebdriverUrlInfo for T
 where
-    T: BinaryVersionHintUrlInfo + Sync,
+    T: VersionReqUrlInfo + Sync,
 {
     async fn version_urls(&self, limit: usize) -> Result<Vec<VersionUrl>, UrlError> {
         let url_infos = self.driver_version_urls().await?;
 
-        let cmp: Box<dyn Fn(&VersionUrl, &VersionUrl) -> Ordering> = match self.binary_version() {
+        let cmp: Box<dyn Fn(&VersionUrl, &VersionUrl) -> Ordering> = match self.version_req() {
             Ok(version_hint) => Box::new(move |left: &VersionUrl, right: &VersionUrl| {
                 Self::compare_version(&version_hint, &left.version, &right.version)
             }),
@@ -92,26 +94,24 @@ mod tests {
     use std::cmp::Ordering;
 
     use async_trait::async_trait;
-    use semver::Version;
+    use semver::{Version, VersionReq};
 
-    use crate::common::binary_version_hint_url_info::{
-        BinaryVersionError, BinaryVersionHintUrlInfo, VersionUrl,
+    use crate::common::version_req_url_info::{
+        VersionReqError, VersionReqUrlInfo, VersionUrl,
     };
     use crate::common::url_info::{UrlError, WebdriverUrlInfo};
 
     struct MockBinaryMajorVersionHintUrlInfo {
-        version_hint: Option<Version>,
+        version_hint: Option<VersionReq>,
         version_urls: Vec<VersionUrl>,
     }
 
     #[async_trait]
-    impl BinaryVersionHintUrlInfo for MockBinaryMajorVersionHintUrlInfo {
-        fn binary_version(&self) -> Result<Version, BinaryVersionError> {
+    impl VersionReqUrlInfo for MockBinaryMajorVersionHintUrlInfo {
+        fn version_req(&self) -> Result<VersionReq, VersionReqError> {
             self.version_hint
                 .clone()
-                .ok_or(BinaryVersionError::Other(anyhow::anyhow!(
-                    "No version hint"
-                )))
+                .ok_or(VersionReqError::Other(anyhow::anyhow!("No version hint")))
         }
 
         async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>, UrlError> {
@@ -128,7 +128,7 @@ mod tests {
     fn compare_version_prioritizes_same_major_version() {
         assert_eq!(
             MockBinaryMajorVersionHintUrlInfo::compare_version(
-                &Version::new(2, 0, 0),
+                &VersionReq::parse("^2.0.0").unwrap(),
                 &Version::new(3, 0, 0),
                 &Version::new(2, 0, 0),
             ),
