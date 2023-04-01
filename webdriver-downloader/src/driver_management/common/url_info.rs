@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use semver::Version;
+use semver::{Version, VersionReq};
 
 use crate::common::version_req_url_info::VersionReqError;
 
@@ -8,14 +8,15 @@ pub enum UrlError {
     #[error("Failed to download Urls: {0}")]
     Download(#[from] reqwest::Error),
     #[error(transparent)]
-    BinaryVersion(#[from] VersionReqError),
+    VersionReq(#[from] VersionReqError),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct VersionUrl {
-    pub version: Version,
+pub struct WebdriverVersionUrl {
+    pub version_req: VersionReq,
+    pub webdriver_version: Version,
     pub url: String,
 }
 
@@ -23,5 +24,5 @@ pub struct VersionUrl {
 #[async_trait]
 pub trait WebdriverUrlInfo {
     /// Lists viable VersionUrls, up to `limit`.
-    async fn version_urls(&self, limit: usize) -> Result<Vec<VersionUrl>, UrlError>;
+    async fn version_urls(&self, limit: usize) -> Result<Vec<WebdriverVersionUrl>, UrlError>;
 }

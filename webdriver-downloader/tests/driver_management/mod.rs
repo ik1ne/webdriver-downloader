@@ -5,8 +5,8 @@ mod tests {
     use anyhow::anyhow;
     use mockall::predicate::eq;
     use semver::Version;
-    use webdriver_downloader::common::url_info::VersionUrl;
 
+    use webdriver_downloader::common::url_info::WebdriverVersionUrl;
     use webdriver_downloader::WebdriverInfo;
 
     use crate::MockWebdriverInfo;
@@ -26,8 +26,9 @@ mod tests {
         let mut mock = MockWebdriverInfo::new();
         let version_count = 5;
 
-        let dummy_version_url = VersionUrl {
-            version: Version::new(0, 0, 0),
+        let dummy_version_url = WebdriverVersionUrl {
+            version_req: Default::default(),
+            webdriver_version: Version::new(0, 0, 0),
             url: Default::default(),
         };
         let urls = vec![dummy_version_url; version_count];

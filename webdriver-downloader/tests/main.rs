@@ -9,10 +9,11 @@ use tempfile::TempDir;
 use webdriver_downloader::common::installation_info::{
     InstallationError, WebdriverInstallationInfo,
 };
-use webdriver_downloader::common::url_info::{UrlError, VersionUrl, WebdriverUrlInfo};
+use webdriver_downloader::common::url_info::{UrlError, WebdriverUrlInfo, WebdriverVersionUrl};
 use webdriver_downloader::common::verification_info::{
     VerificationError, WebdriverVerificationInfo,
 };
+
 mod driver_management;
 
 mock! {
@@ -21,7 +22,7 @@ mock! {
 
     #[async_trait]
     impl WebdriverUrlInfo for WebdriverInfo {
-        async fn version_urls(&self, limit: usize) -> Result<Vec<VersionUrl>, UrlError>;
+        async fn version_urls(&self, limit: usize) -> Result<Vec<WebdriverVersionUrl>, UrlError>;
     }
 
     #[async_trait]
