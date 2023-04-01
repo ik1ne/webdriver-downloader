@@ -7,8 +7,8 @@ use crate::common::installation_info::{InstallationError, WebdriverInstallationI
 use crate::common::url_info::{UrlError, WebdriverUrlInfo};
 use crate::common::verification_info::{VerificationError, WebdriverVerificationInfo};
 
-pub mod driver_impls;
 pub mod common;
+pub mod driver_impls;
 
 /// Information required to download, verify, install driver.
 #[async_trait]
@@ -48,7 +48,10 @@ where
         let url_count = version_urls.len();
 
         for version_url in version_urls {
-            println!("Trying url for version {}: {}.", version_url.version, version_url.url);
+            println!(
+                "Trying url for version {}: {}.",
+                version_url.webdriver_version, version_url.url
+            );
             let tempdir = TempDir::new()?;
 
             let temp_driver_path = self.download_in_tempdir(version_url.url, &tempdir).await?;

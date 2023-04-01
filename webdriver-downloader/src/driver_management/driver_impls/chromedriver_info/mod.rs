@@ -1,16 +1,15 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Context;
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use regex::Regex;
-use semver::VersionReq;
+use semver::{Version, VersionReq};
 use serde_json::{json, Map};
 
-use crate::common::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 use crate::common::installation_info::WebdriverInstallationInfo;
-use crate::common::url_info::{UrlError, VersionUrl};
+use crate::common::url_info::{UrlError, WebdriverVersionUrl};
 use crate::common::verification_info::WebdriverVerificationInfo;
+use crate::common::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
 mod os_specific;
 
@@ -31,37 +30,34 @@ impl ChromedriverInfo {
 
 #[async_trait]
 impl VersionReqUrlInfo for ChromedriverInfo {
-    fn version_req(&self) -> Result<VersionReq, VersionReqError> {
-        let version_string = format!("^{}", os_specific::binary_version(&self.browser_path)?);
-        VersionReq::parse(&version_string).map_err(|e| e.into())
+    fn binary_version(&self) -> Result<Version, VersionReqError> {
+        os_specific::binary_version(&self.browser_path)
     }
 
-    async fn driver_version_urls(&self) -> Result<Vec<VersionUrl>, UrlError> {
+    async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
         let download_xml = "https://chromedriver.storage.googleapis.com";
 
         let xml = reqwest::get(download_xml).await?.text().await?;
 
         let re = Regex::new(os_specific::ZIPFILE_NAME_RE).expect("Failed to parse regex.");
 
-        let mut versions = vec![];
+        let mut versions: Vec<WebdriverVersionUrl> = vec![];
         for capture in re.captures_iter(&xml) {
             let version_string = capture.get(1).map_or("", |s| s.as_str()).to_string();
-            let version = lenient_semver::parse(&version_string)
-                .map_err(|e| e.owned())
-                .with_context(|| format!("Failed to parse version: \"{}\"", version_string))?;
+            let webdriver_version = lenient_semver::parse(&version_string)
+                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
 
-            versions.push((version_string, version));
+            let version_req = VersionReq::parse(&format!("^{}", webdriver_version))
+                .map_err(VersionReqError::ParseVersionReq)?;
+
+            versions.push(WebdriverVersionUrl {
+                version_req,
+                webdriver_version,
+                url: os_specific::build_url(&version_string),
+            });
         }
 
-        versions.sort_by(|l, r| l.1.cmp(&r.1).reverse());
-
-        Ok(versions
-            .into_iter()
-            .map(|(version_string, version)| VersionUrl {
-                version,
-                url: os_specific::build_url(&version_string),
-            })
-            .collect())
+        Ok(versions)
     }
 }
 
@@ -109,6 +105,6 @@ mod tests {
             browser_path: browser_path.into(),
         };
 
-        assert!(chromedriver_info.version_req().is_ok());
+        assert!(chromedriver_info.binary_version().is_ok());
     }
 }
