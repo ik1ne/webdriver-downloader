@@ -1,14 +1,14 @@
 use async_trait::async_trait;
 use semver::Version;
 
-use crate::common::binary_version_hint_url_info::BinaryVersionError;
+use crate::common::version_req_url_info::VersionReqError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum UrlError {
     #[error("Failed to download Urls: {0}")]
     Download(#[from] reqwest::Error),
     #[error(transparent)]
-    BinaryVersion(#[from] BinaryVersionError),
+    BinaryVersion(#[from] VersionReqError),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
