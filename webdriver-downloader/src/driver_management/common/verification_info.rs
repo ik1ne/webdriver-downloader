@@ -45,6 +45,8 @@ pub trait WebdriverVerificationInfo {
         let _child = ChildGuard(
             std::process::Command::new(OsStr::new(driver_path.as_ref()))
                 .arg(&format!("--port={}", port))
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
                 .spawn()?,
         );
 

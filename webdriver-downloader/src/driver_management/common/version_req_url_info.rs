@@ -75,21 +75,23 @@ where
                 }
             };
 
-        let mut major_version_map: BTreeMap<u64, WebdriverVersionUrl> = BTreeMap::new();
+        let mut semver_map: BTreeMap<(u64, u64), WebdriverVersionUrl> = BTreeMap::new();
 
         for version_url in url_infos {
-            if let Some(existing_version_url) =
-                major_version_map.get_mut(&version_url.webdriver_version.major)
-            {
+            let key = (
+                version_url.webdriver_version.major,
+                version_url.webdriver_version.minor,
+            );
+            if let Some(existing_version_url) = semver_map.get_mut(&key) {
                 if cmp(&version_url, existing_version_url) == Ordering::Greater {
                     *existing_version_url = version_url;
                 }
             } else {
-                major_version_map.insert(version_url.webdriver_version.major, version_url);
+                semver_map.insert(key, version_url);
             }
         }
 
-        let mut versions = major_version_map.into_values().collect::<Vec<_>>();
+        let mut versions = semver_map.into_values().collect::<Vec<_>>();
 
         versions.sort_by(|l, r| cmp(r, l));
 

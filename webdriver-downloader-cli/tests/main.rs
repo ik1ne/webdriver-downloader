@@ -9,6 +9,7 @@ const CHROMEDRIVER_BIN: &str = "chromedriver.exe";
 #[cfg(unix)]
 const CHROMEDRIVER_BIN: &str = "chromedriver";
 
+// Tests for chromedriver, which also checks overall functionality.
 #[test]
 fn test_passes_no_mkdir() {
     let temp_dir = assert_fs::TempDir::new().unwrap();
@@ -75,4 +76,29 @@ fn test_fails_no_browser() {
         .assert();
 
     assert.failure();
+}
+
+// Tests for other drivers.
+
+// geckodriver
+#[cfg(target_os = "windows")]
+const GECKODRIVER_BIN: &str = "geckodriver.exe";
+#[cfg(unix)]
+const GECKODRIVER_BIN: &str = "geckodriver";
+
+#[test]
+fn test_geckodriver() {
+    let temp_dir = assert_fs::TempDir::new().unwrap();
+    let mut driver_path = temp_dir.to_path_buf();
+    driver_path.push(GECKODRIVER_BIN);
+
+    let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
+    let assert = cmd
+        .args([OsStr::new("--driver"), driver_path.as_os_str()].iter())
+        .assert();
+
+    assert.success();
+    temp_dir
+        .child(GECKODRIVER_BIN)
+        .assert(predicate::path::exists());
 }
