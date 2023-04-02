@@ -9,6 +9,10 @@ pub enum UrlError {
     Download(#[from] reqwest::Error),
     #[error(transparent)]
     VersionReq(#[from] VersionReqError),
+    #[error("Failed to parse html: \"{0}\"")]
+    Parse(String),
+    #[error(transparent)]
+    Version(#[from] lenient_semver::parser::OwnedError),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

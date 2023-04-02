@@ -47,7 +47,7 @@ impl DriverType {
             DriverType::Chrome => {
                 PathBuf::from(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
             }
-            DriverType::Gecko => todo!("Geckodriver is not implemented yet."),
+            DriverType::Gecko => PathBuf::from(r"C:\Program Files\Mozilla Firefox\firefox.exe"),
         }
     }
 }
@@ -64,7 +64,7 @@ impl DriverType {
     fn default_browser_path(&self) -> PathBuf {
         match self {
             DriverType::Chrome => PathBuf::from(r"/bin/google-chrome-stable"),
-            DriverType::Gecko => todo!("Geckodriver is not implemented yet."),
+            DriverType::Gecko => PathBuf::from(r"/bin/firefox"),
         }
     }
 }
@@ -83,7 +83,7 @@ impl DriverType {
             DriverType::Chrome => {
                 PathBuf::from(r"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
             }
-            DriverType::Gecko => todo!("Geckodriver is not implemented yet."),
+            DriverType::Gecko => PathBuf::from(r"/Applications/Firefox.app/Contents/MacOS/firefox"),
         }
     }
 }

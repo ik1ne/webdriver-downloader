@@ -47,7 +47,7 @@ fn get_driver_type(matches: &ArgMatches) -> DriverType {
 
     match browser_type.as_str() {
         "chrome" => DriverType::Chrome,
-        "gecko" => todo!("Geckodriver is not implemented yet."),
+        "gecko" => DriverType::Gecko,
         _ => panic!("Unexpected argument value of \"type\". {:?}", browser_type),
     }
 }
