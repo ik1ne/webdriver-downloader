@@ -94,7 +94,15 @@ fn test_geckodriver() {
 
     let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
     let assert = cmd
-        .args([OsStr::new("--driver"), driver_path.as_os_str()].iter())
+        .args(
+            [
+                OsStr::new("--driver"),
+                driver_path.as_os_str(),
+                OsStr::new("--type"),
+                OsStr::new("gecko"),
+            ]
+            .iter(),
+        )
         .assert();
 
     assert.success();
