@@ -1,5 +1,5 @@
 # webdriver-downloader
-Cli Interface&amp;Library for webdriver download. Supports chromedriver for Windows, Linux and macOS.
+Cli Interface&amp;Library for webdriver download. Supports chromedriver, geckodriver for Windows, Linux and macOS.
 
 ## Usage
 
@@ -18,6 +18,10 @@ webdriver-download.exe --mkdir --driver ./drivers/chromedriver.exe
 # You can also provide the path to the browser executable, which is useful for downloading webdriver for different channels.
 webdriver-download.exe --mkdir --driver ./drivers/chromedriver_dev.exe --browser "C:/Program Files/Google/Chrome Dev/Application/chrome.exe"
 
+
+
+# Supported driver types are "chromedriver", "geckodriver".
+webdriver-download.exe --type gecko
 ```
 
 ### Library
