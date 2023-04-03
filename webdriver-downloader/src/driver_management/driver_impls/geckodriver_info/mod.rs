@@ -48,6 +48,7 @@ impl VersionReqUrlInfo for GeckodriverInfo {
 
         let document = Html::parse_fragment(&html);
 
+        dbg!(&html);
         if !document.errors.is_empty() {
             return Err(UrlError::Parse(html));
         }

@@ -3,7 +3,7 @@ use std::path::Path;
 
 use semver::Version;
 
-use crate::driver_impls::chromedriver_info::VersionReqError;
+use crate::common::version_req_url_info::VersionReqError;
 
 pub const DRIVER_NAME_IN_ARCHIVE: &str = "geckodriver.exe";
 
