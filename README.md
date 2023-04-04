@@ -20,7 +20,7 @@ webdriver-download.exe --mkdir --driver ./drivers/chromedriver_dev.exe --browser
 
 
 
-# Supported driver types are "chromedriver", "geckodriver".
+# Supported driver types are "chrome", "gecko".
 webdriver-download.exe --type gecko
 ```
 
