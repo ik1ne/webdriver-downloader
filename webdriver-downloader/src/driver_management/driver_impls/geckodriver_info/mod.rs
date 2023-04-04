@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
-use scraper::{Html, Selector};
+use regex::Regex;
 use semver::{Version, VersionReq};
 use serde_json::{json, Map};
 
@@ -46,50 +46,44 @@ impl VersionReqUrlInfo for GeckodriverInfo {
             .take_while(|line| !line.is_empty())
             .collect::<String>();
 
-        let document = Html::parse_fragment(&html);
+        // parses <tr>  <td>0.33.0  <td>≥ 3.11 (3.14 Python)  <td>102 ESR  <td>n/a
+        // or <tr>  <td>0.19.0  <td>≥ 3.5  <td>55  <td>62
+        let re = Regex::new(
+            r#"<tr>\s*<td>([0-9.]*?)\s*<td>[^<]*<td>([0-9.]*?)( ESR)?\s*<td>([0-9.]*|n/a)"#,
+        )
+        .unwrap();
 
-        dbg!(&html);
-        if !document.errors.is_empty() {
-            return Err(UrlError::Parse(html));
+        let mut versions: Vec<WebdriverVersionUrl> = vec![];
+        for captures in re.captures_iter(&html) {
+            let or_else =
+                || VersionReqError::RegexError(captures.get(0).unwrap().as_str().to_string());
+
+            let version_str = captures.get(1).ok_or_else(or_else)?.as_str();
+            let min_firefox_version_str = captures.get(2).ok_or_else(or_else)?.as_str();
+            let max_firefox_version_str = captures.get(4).ok_or_else(or_else)?.as_str();
+
+            let webdriver_version = lenient_semver::parse(version_str)
+                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+            let min_version = lenient_semver::parse(min_firefox_version_str)
+                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+            let max_version = lenient_semver::parse(max_firefox_version_str).ok();
+
+            let version_req_string = match max_version {
+                Some(max_version) => format!(">= {}, <= {}", min_version, max_version),
+                None => format!(">= {}", min_version),
+            };
+
+            let version_req =
+                VersionReq::parse(&version_req_string).map_err(VersionReqError::ParseVersionReq)?;
+
+            versions.push(WebdriverVersionUrl {
+                version_req,
+                webdriver_version,
+                url: os_specific::build_url(version_str),
+            })
         }
 
-        let mut results = vec![];
-
-        let row_selector = Selector::parse("table tr").unwrap();
-        let cell_selector = Selector::parse("td").unwrap();
-
-        for row in document.select(&row_selector).skip(1) {
-            let mut cells = row.select(&cell_selector);
-            if let (Some(geckodriver_version), Some(firefox_version)) = (cells.next(), cells.nth(1))
-            {
-                let geckodriver_version_string = geckodriver_version
-                    .text()
-                    .collect::<String>()
-                    .chars()
-                    .take_while(|c| *c != ' ')
-                    .collect::<String>();
-                let firefox_version = firefox_version
-                    .text()
-                    .collect::<String>()
-                    .chars()
-                    .take_while(|c| *c != ' ')
-                    .collect::<String>();
-
-                let firefox_version_req =
-                    VersionReq::parse(&format!(">={}", firefox_version)).unwrap();
-
-                let geckodriver_version =
-                    lenient_semver::parse(&geckodriver_version_string).map_err(|e| e.owned())?;
-
-                results.push(WebdriverVersionUrl {
-                    version_req: firefox_version_req,
-                    webdriver_version: geckodriver_version,
-                    url: os_specific::build_url(&geckodriver_version_string),
-                })
-            }
-        }
-
-        Ok(results)
+        Ok(versions)
     }
 }
 

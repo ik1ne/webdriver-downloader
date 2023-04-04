@@ -42,9 +42,12 @@ impl VersionReqUrlInfo for ChromedriverInfo {
         let re = Regex::new(os_specific::ZIPFILE_NAME_RE).expect("Failed to parse regex.");
 
         let mut versions: Vec<WebdriverVersionUrl> = vec![];
-        for capture in re.captures_iter(&xml) {
-            let version_string = capture.get(1).map_or("", |s| s.as_str()).to_string();
-            let webdriver_version = lenient_semver::parse(&version_string)
+        for captures in re.captures_iter(&xml) {
+            let or_else =
+                || VersionReqError::RegexError(captures.get(0).unwrap().as_str().to_string());
+
+            let version_str = captures.get(1).ok_or_else(or_else)?.as_str();
+            let webdriver_version = lenient_semver::parse(version_str)
                 .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
 
             let version_req = VersionReq::parse(&format!("^{}", webdriver_version))
@@ -53,7 +56,7 @@ impl VersionReqUrlInfo for ChromedriverInfo {
             versions.push(WebdriverVersionUrl {
                 version_req,
                 webdriver_version,
-                url: os_specific::build_url(&version_string),
+                url: os_specific::build_url(version_str),
             });
         }
 
