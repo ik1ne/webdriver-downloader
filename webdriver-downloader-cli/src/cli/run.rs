@@ -1,3 +1,4 @@
+use webdriver_downloader::common::verification_info::WebdriverVerificationInfo;
 use webdriver_downloader::driver_impls::{ChromedriverInfo, GeckodriverInfo};
 use webdriver_downloader::WebdriverInfo;
 
@@ -14,6 +15,10 @@ pub async fn run() -> anyhow::Result<()> {
     match args.driver_type {
         DriverType::Chrome => {
             let driver_info = ChromedriverInfo::new(args.driver_install_path, args.browser_path);
+
+            if let Err(_) = driver_info.verify_driver(&args.driver_install_path).await {
+                driver_info.download_verify_install(5).await?;
+            }
 
             driver_info.download_verify_install(5).await?;
             Ok(())
