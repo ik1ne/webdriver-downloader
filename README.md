@@ -10,7 +10,7 @@ Cli Interface&amp;Library for webdriver download. Supports chromedriver, geckodr
 cargo install webdriver-downloader-cli
 
 # Installs chromedriver into %USERPROFILE%/bin/chromedriver.exe ($HOME/bin/chromedriver for unix family)
-webdriver-downlod.exe
+webdriver-download.exe
 
 # You can specify path to install driver to. Adding mkdir flag will create the parent directiry.
 webdriver-download.exe --mkdir --driver ./drivers/chromedriver.exe
