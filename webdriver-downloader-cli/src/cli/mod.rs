@@ -43,11 +43,15 @@ impl DriverType {
     }
 
     fn default_browser_path(&self) -> PathBuf {
+        let program_files = std::env::var("ProgramFiles").unwrap();
         match self {
-            DriverType::Chrome => {
-                PathBuf::from(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+            DriverType::Chrome => PathBuf::from(format!(
+                r"{}\Google\Chrome\Application\chrome.exe",
+                program_files
+            )),
+            DriverType::Gecko => {
+                PathBuf::from(format!(r"{}\Mozilla Firefox\firefox.exe", program_files))
             }
-            DriverType::Gecko => PathBuf::from(r"C:\Program Files\Mozilla Firefox\firefox.exe"),
         }
     }
 }
