@@ -12,7 +12,7 @@ cargo install webdriver-downloader-cli
 # Installs chromedriver into %USERPROFILE%/bin/chromedriver.exe ($HOME/bin/chromedriver for unix family)
 webdriver-downloader.exe
 
-# You can specify path to install driver to. Adding mkdir flag will create the parent directiry.
+# You can specify path to install driver to. Adding mkdir flag will create the parent directory.
 webdriver-downloader.exe --mkdir --driver ./drivers/chromedriver.exe
 
 # You can also provide the path to the browser executable, which is useful for downloading webdriver for different channels.
@@ -29,7 +29,7 @@ webdriver-downloader.exe --type gecko
 ```rust
 use std::path::PathBuf;
 
-use webdriver_downloader::structs::ChromedriverInfo;
+use webdriver_downloader::driver_impls::ChromedriverInfo;
 
 #[tokio::main]
 async fn main() {
@@ -44,4 +44,4 @@ async fn main() {
 ```
 
 #### Implementing downloader for custom driver
-You can implement trait `WebdriverUrlInfo, WebdriverInstallationInfo, WebdriverVerificationInfo` for CustomDriverInfo and call `custom_driver_info.download_verify_install(max_attempts)`.
+You can implement trait `WebdriverUrlInfo, WebdriverInstallationInfo, WebdriverVerificationInfo` for `struct CustomDriverInfo` and call `custom_driver_info.download_verify_install(max_attempts)`.
