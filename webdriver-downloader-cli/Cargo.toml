@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader-cli"
-version = "0.4.3"
+version = "0.4.4"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Cli Interface for webdriver download."
