@@ -35,10 +35,10 @@ pub trait WebdriverInstallationInfo {
     fn driver_install_path(&self) -> &Path;
 
     /// Driver executable name in archive file.
-    fn driver_name_in_archive(&self) -> &'static str;
+    fn driver_name_in_archive(&self) -> &str;
 
     /// Downloads url and extracts the driver inside tempdir.
-    async fn download_in_tempdir<U: 'static + IntoUrl + AsRef<str> + Send>(
+    async fn download_in_tempdir<U: IntoUrl + AsRef<str> + Send>(
         &self,
         url: U,
         dir: &TempDir,
@@ -67,7 +67,7 @@ pub trait WebdriverInstallationInfo {
         Ok(driver_path)
     }
 
-    fn install_driver<P: AsRef<Path> + 'static>(
+    fn install_driver<P: AsRef<Path>>(
         &self,
         temp_driver_path: &P,
     ) -> Result<(), InstallationError> {

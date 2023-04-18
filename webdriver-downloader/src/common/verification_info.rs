@@ -37,7 +37,7 @@ pub trait WebdriverVerificationInfo {
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
     /// Verifies driver using [test_client](WebdriverVerificationInfo::test_client).
-    async fn verify_driver<P: AsRef<Path> + Sync + 'static>(
+    async fn verify_driver<P: AsRef<Path> + Sync>(
         &self,
         driver_path: &P,
     ) -> Result<(), VerificationError> {
