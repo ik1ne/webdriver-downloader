@@ -6,8 +6,8 @@ mod tests {
     use mockall::predicate::eq;
     use semver::Version;
 
-    use webdriver_downloader::common::url_info::WebdriverVersionUrl;
-    use webdriver_downloader::WebdriverInfo;
+    use webdriver_downloader::url_info::WebdriverVersionUrl;
+    use webdriver_downloader::WebdriverDownloadInfo;
 
     use crate::MockWebdriverInfo;
 

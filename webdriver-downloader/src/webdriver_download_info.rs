@@ -7,12 +7,9 @@ use crate::common::installation_info::{InstallationError, WebdriverInstallationI
 use crate::common::url_info::{UrlError, WebdriverUrlInfo};
 use crate::common::verification_info::{VerificationError, WebdriverVerificationInfo};
 
-pub mod common;
-pub mod driver_impls;
-
 /// Information required to download, verify, install driver.
 #[async_trait]
-pub trait WebdriverInfo:
+pub trait WebdriverDownloadInfo:
     WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync
 {
     async fn download_verify_install(&self, max_tries: usize)
@@ -36,7 +33,7 @@ pub enum WebdriverDownloadError {
 }
 
 #[async_trait]
-impl<T> WebdriverInfo for T
+impl<T> WebdriverDownloadInfo for T
 where
     T: WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync,
 {
