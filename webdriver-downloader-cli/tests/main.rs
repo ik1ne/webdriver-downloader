@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 
 use assert_cmd::Command;
 use assert_fs::prelude::*;
+use predicates::ord::eq;
 use predicates::prelude::*;
 
 #[cfg(target_os = "windows")]
@@ -49,6 +50,34 @@ fn test_passes_mkdir() {
     assert.success();
     temp_dir
         .child(format!("new_dir/{}", CHROMEDRIVER_BIN))
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn test_existing_driver() {
+    let temp_dir = assert_fs::TempDir::new().unwrap();
+    let mut driver_path = temp_dir.to_path_buf();
+    driver_path.push(CHROMEDRIVER_BIN);
+
+    let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
+    let assert = cmd
+        .args([OsStr::new("--driver"), driver_path.as_os_str()].iter())
+        .assert();
+
+    assert.success();
+    temp_dir
+        .child(CHROMEDRIVER_BIN)
+        .assert(predicate::path::exists());
+
+    let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
+    let assert = cmd
+        .args([OsStr::new("--driver"), driver_path.as_os_str()].iter())
+        .assert();
+
+    assert.success().stdout(eq("Driver already installed.\n"));
+
+    temp_dir
+        .child(CHROMEDRIVER_BIN)
         .assert(predicate::path::exists());
 }
 

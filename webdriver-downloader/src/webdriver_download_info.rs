@@ -12,6 +12,8 @@ use crate::common::verification_info::{VerificationError, WebdriverVerificationI
 pub trait WebdriverDownloadInfo:
     WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync
 {
+    async fn is_installed(&self) -> bool;
+
     async fn download_verify_install(&self, max_tries: usize)
         -> Result<(), WebdriverDownloadError>;
 }
@@ -37,6 +39,11 @@ impl<T> WebdriverDownloadInfo for T
 where
     T: WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync,
 {
+    async fn is_installed(&self) -> bool {
+        let driver_path = self.driver_install_path();
+        self.verify_driver(&driver_path).await.is_ok()
+    }
+
     async fn download_verify_install(
         &self,
         max_tries: usize,
