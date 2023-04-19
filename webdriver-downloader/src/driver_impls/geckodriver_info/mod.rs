@@ -13,15 +13,15 @@ use crate::common::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
 mod os_specific;
 
-/// Information required to implement [WebdriverInfo](crate::WebdriverInfo) for Chromedriver.
-pub struct ChromedriverInfo {
+/// Information required to implement [WebdriverDownloadInfo](crate::WebdriverDownloadInfo) for Geckodriver.
+pub struct GeckodriverInfo {
     driver_install_path: PathBuf,
     browser_path: PathBuf,
 }
 
-impl ChromedriverInfo {
+impl GeckodriverInfo {
     pub fn new(driver_install_path: PathBuf, browser_path: PathBuf) -> Self {
-        ChromedriverInfo {
+        GeckodriverInfo {
             driver_install_path,
             browser_path,
         }
@@ -29,42 +29,65 @@ impl ChromedriverInfo {
 }
 
 #[async_trait]
-impl VersionReqUrlInfo for ChromedriverInfo {
+impl VersionReqUrlInfo for GeckodriverInfo {
     fn binary_version(&self) -> Result<Version, VersionReqError> {
         os_specific::binary_version(&self.browser_path)
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
-        let download_xml = "https://chromedriver.storage.googleapis.com";
+        let download_html =
+            "https://firefox-source-docs.mozilla.org/_sources/testing/geckodriver/Support.md.txt";
 
-        let xml = reqwest::get(download_xml).await?.text().await?;
+        let html = reqwest::get(download_html).await?.text().await?;
 
-        let re = Regex::new(os_specific::ZIPFILE_NAME_RE).expect("Failed to parse regex.");
+        let html = html
+            .lines()
+            .skip_while(|line| *line != "<table>")
+            .take_while(|line| !line.is_empty())
+            .collect::<String>();
+
+        // parses <tr>  <td>0.33.0  <td>≥ 3.11 (3.14 Python)  <td>102 ESR  <td>n/a
+        // or <tr>  <td>0.19.0  <td>≥ 3.5  <td>55  <td>62
+        let re = Regex::new(
+            r#"<tr>\s*<td>([0-9.]*?)\s*<td>[^<]*<td>([0-9.]*?)( ESR)?\s*<td>([0-9.]*|n/a)"#,
+        )
+        .unwrap();
 
         let mut versions: Vec<WebdriverVersionUrl> = vec![];
-        for captures in re.captures_iter(&xml) {
+        for captures in re.captures_iter(&html) {
             let or_else =
                 || VersionReqError::RegexError(captures.get(0).unwrap().as_str().to_string());
 
             let version_str = captures.get(1).ok_or_else(or_else)?.as_str();
+            let min_firefox_version_str = captures.get(2).ok_or_else(or_else)?.as_str();
+            let max_firefox_version_str = captures.get(4).ok_or_else(or_else)?.as_str();
+
             let webdriver_version = lenient_semver::parse(version_str)
                 .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+            let min_version = lenient_semver::parse(min_firefox_version_str)
+                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+            let max_version = lenient_semver::parse(max_firefox_version_str).ok();
 
-            let version_req = VersionReq::parse(&format!("^{}", webdriver_version))
-                .map_err(VersionReqError::ParseVersionReq)?;
+            let version_req_string = match max_version {
+                Some(max_version) => format!(">= {}, <= {}", min_version, max_version),
+                None => format!(">= {}", min_version),
+            };
+
+            let version_req =
+                VersionReq::parse(&version_req_string).map_err(VersionReqError::ParseVersionReq)?;
 
             versions.push(WebdriverVersionUrl {
                 version_req,
                 webdriver_version,
                 url: os_specific::build_url(version_str),
-            });
+            })
         }
 
         Ok(versions)
     }
 }
 
-impl WebdriverInstallationInfo for ChromedriverInfo {
+impl WebdriverInstallationInfo for GeckodriverInfo {
     fn driver_install_path(&self) -> &Path {
         &self.driver_install_path
     }
@@ -74,7 +97,7 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
     }
 }
 
-impl WebdriverVerificationInfo for ChromedriverInfo {
+impl WebdriverVerificationInfo for GeckodriverInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
         let capabilities_value = json!({
             "binary": self.browser_path,
@@ -83,7 +106,7 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
 
         let mut capabilities = Map::new();
 
-        capabilities.insert("goog:chromeOptions".to_string(), capabilities_value);
+        capabilities.insert("moz:firefoxOptions".to_string(), capabilities_value);
 
         Some(capabilities)
     }
@@ -92,22 +115,22 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
 #[cfg(test)]
 mod tests {
     use crate::common::version_req_url_info::VersionReqUrlInfo;
-    use crate::driver_impls::ChromedriverInfo;
+    use crate::driver_impls::GeckodriverInfo;
 
     #[test]
     fn test_get_binary_version() {
         #[cfg(target_os = "windows")]
-        let browser_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe";
+        let browser_path = r"C:\Program Files\Mozilla Firefox\firefox.exe";
         #[cfg(target_os = "linux")]
-        let browser_path = "/usr/bin/google-chrome";
+        let browser_path = "/usr/bin/firefox";
         #[cfg(target_os = "macos")]
-        let browser_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+        let browser_path = "/Applications/Firefox.app/Contents/MacOS/firefox";
 
-        let chromedriver_info = ChromedriverInfo {
+        let geckodriver_info = GeckodriverInfo {
             driver_install_path: "".into(),
             browser_path: browser_path.into(),
         };
 
-        assert!(chromedriver_info.binary_version().is_ok());
+        assert!(geckodriver_info.binary_version().is_ok());
     }
 }
