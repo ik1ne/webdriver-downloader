@@ -34,8 +34,8 @@ pub trait WebdriverInstallationInfo {
     /// Path to install driver.
     fn driver_install_path(&self) -> &Path;
 
-    /// Driver executable name in archive file.
-    fn driver_name_in_archive(&self) -> &str;
+    /// Driver executable name.
+    fn driver_executable_name(&self) -> &str;
 
     /// Downloads url and extracts the driver inside tempdir.
     async fn download_in_tempdir<U: IntoUrl + AsRef<str> + Send>(
@@ -49,15 +49,15 @@ pub trait WebdriverInstallationInfo {
         let response = reqwest::get(url).await?;
         let content = Cursor::new(response.bytes().await?);
 
-        let driver_name = self.driver_name_in_archive();
-        let driver_path = dir.path().join(driver_name);
+        let driver_executable_name = self.driver_executable_name();
+        let driver_path = dir.path().join(driver_executable_name);
 
         match archive_type {
             ArchiveType::Zip => {
-                extract_zip(content, driver_name, &driver_path)?;
+                extract_zip(content, driver_executable_name, &driver_path)?;
             }
             ArchiveType::TarGz => {
-                extract_tarball(content, driver_name, &driver_path).await?;
+                extract_tarball(content, driver_executable_name, &driver_path).await?;
             }
         }
 
@@ -92,11 +92,11 @@ fn detect_archive_type(url: &str) -> Option<ArchiveType> {
 
 fn extract_zip(
     content: Cursor<Bytes>,
-    driver_name: &str,
+    driver_executable_name: &str,
     driver_path: &Path,
 ) -> Result<u64, InstallationError> {
     let mut archive = ZipArchive::new(content)?;
-    let mut driver_content = archive.by_name(driver_name)?;
+    let mut driver_content = archive.by_name(driver_executable_name)?;
 
     let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
     io::copy(&mut driver_content, &mut driver_file).map_err(InstallationError::Write)
@@ -104,7 +104,7 @@ fn extract_zip(
 
 async fn extract_tarball(
     content: Cursor<Bytes>,
-    driver_name: &str,
+    driver_executable_name: &str,
     driver_path: &Path,
 ) -> Result<(), InstallationError> {
     let tar = flate2::bufread::GzDecoder::new(content);
@@ -115,7 +115,7 @@ async fn extract_tarball(
         if entry
             .path()
             .map_err(InstallationError::ExtractTar)?
-            .ends_with(driver_name)
+            .ends_with(driver_executable_name)
         {
             let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
             io::copy(&mut entry, &mut driver_file).map_err(InstallationError::Write)?;

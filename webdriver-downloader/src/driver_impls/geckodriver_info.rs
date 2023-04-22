@@ -6,12 +6,12 @@ use regex::Regex;
 use semver::{Version, VersionReq};
 use serde_json::{json, Map};
 
-use crate::common::installation_info::WebdriverInstallationInfo;
-use crate::common::url_info::{UrlError, WebdriverVersionUrl};
-use crate::common::verification_info::WebdriverVerificationInfo;
-use crate::common::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
-
-mod os_specific;
+use crate::os_specific;
+use crate::os_specific::DefaultPathError;
+use crate::traits::installation_info::WebdriverInstallationInfo;
+use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
+use crate::traits::verification_info::WebdriverVerificationInfo;
+use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
 /// Information required to implement [WebdriverDownloadInfo](crate::WebdriverDownloadInfo) for Geckodriver.
 pub struct GeckodriverInfo {
@@ -26,12 +26,18 @@ impl GeckodriverInfo {
             browser_path,
         }
     }
+
+    pub fn new_default() -> Result<Self, DefaultPathError> {
+        let driver_install_path = os_specific::geckodriver::default_driver_path()?;
+        let browser_path = os_specific::geckodriver::default_browser_path()?;
+        Ok(GeckodriverInfo::new(driver_install_path, browser_path))
+    }
 }
 
 #[async_trait]
 impl VersionReqUrlInfo for GeckodriverInfo {
     fn binary_version(&self) -> Result<Version, VersionReqError> {
-        os_specific::binary_version(&self.browser_path)
+        os_specific::geckodriver::binary_version(&self.browser_path)
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
@@ -79,7 +85,7 @@ impl VersionReqUrlInfo for GeckodriverInfo {
             versions.push(WebdriverVersionUrl {
                 version_req,
                 webdriver_version,
-                url: os_specific::build_url(version_str),
+                url: os_specific::geckodriver::build_url(version_str),
             })
         }
 
@@ -92,8 +98,8 @@ impl WebdriverInstallationInfo for GeckodriverInfo {
         &self.driver_install_path
     }
 
-    fn driver_name_in_archive(&self) -> &'static str {
-        os_specific::DRIVER_NAME_IN_ARCHIVE
+    fn driver_executable_name(&self) -> &'static str {
+        os_specific::geckodriver::DRIVER_EXECUTABLE_NAME
     }
 }
 
@@ -114,8 +120,9 @@ impl WebdriverVerificationInfo for GeckodriverInfo {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::version_req_url_info::VersionReqUrlInfo;
-    use crate::driver_impls::GeckodriverInfo;
+    use crate::traits::version_req_url_info::VersionReqUrlInfo;
+
+    use super::GeckodriverInfo;
 
     #[test]
     fn test_get_binary_version() {

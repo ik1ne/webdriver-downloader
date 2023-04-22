@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 
-use anyhow::bail;
-
 pub use run::run;
+use webdriver_downloader::prelude::*;
 
 mod build_arg;
 mod check_arg;
@@ -24,71 +23,17 @@ pub(self) enum DriverType {
 }
 
 impl DriverType {
-    fn default_driver_install_path(&self) -> anyhow::Result<PathBuf> {
-        match home::home_dir() {
-            Some(home) => Ok(home.join("bin").join(self.driver_executable_name())),
-            None => {
-                bail!("Failed to determine default driver install path.")
-            }
-        }
-    }
-}
-
-#[cfg(target_os = "windows")]
-impl DriverType {
-    fn driver_executable_name(&self) -> &'static str {
+    fn default_driver_install_path(&self) -> Result<PathBuf, os_specific::DefaultPathError> {
         match self {
-            DriverType::Chrome => "chromedriver.exe",
-            DriverType::Gecko => "geckodriver.exe",
+            DriverType::Chrome => os_specific::chromedriver::default_driver_path(),
+            DriverType::Gecko => os_specific::geckodriver::default_driver_path(),
         }
     }
 
-    fn default_browser_path(&self) -> PathBuf {
-        let program_files = std::env::var("ProgramFiles").unwrap();
+    fn default_browser_path(&self) -> Result<PathBuf, os_specific::DefaultPathError> {
         match self {
-            DriverType::Chrome => PathBuf::from(format!(
-                r"{}\Google\Chrome\Application\chrome.exe",
-                program_files
-            )),
-            DriverType::Gecko => {
-                PathBuf::from(format!(r"{}\Mozilla Firefox\firefox.exe", program_files))
-            }
-        }
-    }
-}
-
-#[cfg(target_os = "linux")]
-impl DriverType {
-    fn driver_executable_name(&self) -> &'static str {
-        match self {
-            DriverType::Chrome => "chromedriver",
-            DriverType::Gecko => "geckodriver",
-        }
-    }
-
-    fn default_browser_path(&self) -> PathBuf {
-        match self {
-            DriverType::Chrome => PathBuf::from(r"/bin/google-chrome-stable"),
-            DriverType::Gecko => PathBuf::from(r"/bin/firefox"),
-        }
-    }
-}
-
-#[cfg(target_os = "macos")]
-impl DriverType {
-    fn driver_executable_name(&self) -> &'static str {
-        match self {
-            DriverType::Chrome => "chromedriver",
-            DriverType::Gecko => "geckodriver",
-        }
-    }
-
-    fn default_browser_path(&self) -> PathBuf {
-        match self {
-            DriverType::Chrome => {
-                PathBuf::from(r"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
-            }
-            DriverType::Gecko => PathBuf::from(r"/Applications/Firefox.app/Contents/MacOS/firefox"),
+            DriverType::Chrome => os_specific::chromedriver::default_browser_path(),
+            DriverType::Gecko => os_specific::geckodriver::default_browser_path(),
         }
     }
 }

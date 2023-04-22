@@ -30,7 +30,7 @@ pub(super) fn get_args() -> Result<Args> {
 
     let driver_type = get_driver_type(&matches);
     let driver_install_path = get_driver_install_path(&matches, driver_type)?;
-    let browser_path = get_browser_path(&matches, driver_type);
+    let browser_path = get_browser_path(&matches, driver_type)?;
     let mkdir = get_mkdir(&matches);
     let reinstall = get_reinstall(&matches);
 
@@ -61,21 +61,23 @@ fn get_driver_install_path(matches: &ArgMatches, driver_type: DriverType) -> Res
         .expect("\"driver\" arg is empty");
 
     if driver_install_path == Path::new("-") {
-        driver_type.default_driver_install_path()
+        driver_type
+            .default_driver_install_path()
+            .map_err(|e| e.into())
     } else {
         Ok(driver_install_path.clone())
     }
 }
 
-fn get_browser_path(matches: &ArgMatches, driver_type: DriverType) -> PathBuf {
+fn get_browser_path(matches: &ArgMatches, driver_type: DriverType) -> Result<PathBuf> {
     let browser_path = matches
         .get_one::<PathBuf>("browser")
         .expect("\"browser\" arg is empty");
 
     if browser_path == Path::new("-") {
-        driver_type.default_browser_path()
+        driver_type.default_browser_path().map_err(|e| e.into())
     } else {
-        browser_path.clone()
+        Ok(browser_path.clone())
     }
 }
 

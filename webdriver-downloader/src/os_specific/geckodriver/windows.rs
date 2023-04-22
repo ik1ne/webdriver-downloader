@@ -1,11 +1,17 @@
 use std::ffi::OsString;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use semver::Version;
 
-use crate::common::version_req_url_info::VersionReqError;
+use crate::os_specific::DefaultPathError;
+use crate::traits::version_req_url_info::VersionReqError;
 
-pub const DRIVER_NAME_IN_ARCHIVE: &str = "geckodriver.exe";
+pub const DRIVER_EXECUTABLE_NAME: &str = "geckodriver.exe";
+
+pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
+    let program_files = std::env::var("ProgramFiles")?;
+    PathBuf::from(format!(r"{}\Mozilla Firefox\firefox.exe", program_files))
+}
 
 pub fn build_url(version_string: &str) -> String {
     format!(

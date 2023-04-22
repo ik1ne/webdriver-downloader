@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use async_trait::async_trait;
 use semver::Version;
 
-use crate::common::url_info::WebdriverVersionUrl;
+use crate::traits::url_info::WebdriverVersionUrl;
 
 use super::url_info::{UrlError, WebdriverUrlInfo};
 
@@ -110,8 +110,8 @@ mod tests {
     use async_trait::async_trait;
     use semver::{Version, VersionReq};
 
-    use crate::common::url_info::{UrlError, WebdriverUrlInfo};
-    use crate::common::version_req_url_info::{
+    use crate::traits::url_info::{UrlError, WebdriverUrlInfo};
+    use crate::traits::version_req_url_info::{
         VersionReqError, VersionReqUrlInfo, WebdriverVersionUrl,
     };
 

@@ -3,9 +3,9 @@ use std::io;
 use async_trait::async_trait;
 use tempfile::TempDir;
 
-use crate::common::installation_info::{InstallationError, WebdriverInstallationInfo};
-use crate::common::url_info::{UrlError, WebdriverUrlInfo};
-use crate::common::verification_info::{VerificationError, WebdriverVerificationInfo};
+use crate::traits::installation_info::{InstallationError, WebdriverInstallationInfo};
+use crate::traits::url_info::{UrlError, WebdriverUrlInfo};
+use crate::traits::verification_info::{VerificationError, WebdriverVerificationInfo};
 
 /// Information required to download, verify, install driver.
 #[async_trait]

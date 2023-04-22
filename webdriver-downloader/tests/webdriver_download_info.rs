@@ -2,8 +2,7 @@ use semver::Version;
 use std::sync::{Arc, Mutex};
 
 use common::MockWebdriverDownloadInfo;
-use webdriver_downloader::url_info::WebdriverVersionUrl;
-use webdriver_downloader::WebdriverDownloadInfo;
+use webdriver_downloader::prelude::*;
 
 mod common;
 

@@ -1,7 +1,19 @@
-pub use common::*;
-pub use driver_impls::*;
-pub use webdriver_download_info::*;
+pub mod driver_impls;
+pub mod os_specific;
+pub mod traits;
+pub mod webdriver_download_info;
 
-mod common;
-mod driver_impls;
-mod webdriver_download_info;
+pub mod prelude {
+    pub use crate::driver_impls::chromedriver_info::ChromedriverInfo;
+    pub use crate::driver_impls::geckodriver_info::GeckodriverInfo;
+
+    pub use crate::os_specific;
+
+    pub use crate::traits::installation_info::{
+        AddExecutePermissionError, InstallationError, WebdriverInstallationInfo,
+    };
+    pub use crate::traits::url_info::{UrlError, WebdriverUrlInfo, WebdriverVersionUrl};
+    pub use crate::traits::verification_info::{VerificationError, WebdriverVerificationInfo};
+
+    pub use crate::webdriver_download_info::{WebdriverDownloadError, WebdriverDownloadInfo};
+}
