@@ -8,7 +8,7 @@ pub enum DefaultPathError {
     #[error("Failed to get Program Files directory")]
     ProgramFiles(#[from] std::env::VarError),
     #[error("Failed to run command")]
-    Command(#[from] std::io::Error),
+    Which(#[from] which::Error),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),
