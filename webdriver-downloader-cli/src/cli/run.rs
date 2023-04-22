@@ -1,7 +1,3 @@
-use webdriver_downloader::{
-    ChromedriverInfo, GeckodriverInfo, WebdriverDownloadError, WebdriverDownloadInfo,
-};
-
 use super::build_arg::*;
 use super::check_arg::*;
 use super::*;

@@ -3,7 +3,7 @@ use std::path::Path;
 use regex::Regex;
 use semver::Version;
 
-use crate::common::version_req_url_info::VersionReqError;
+use crate::traits::version_req_url_info::VersionReqError;
 
 pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let re = Regex::new(r"([0-9\.]+)").expect("Failed to parse regex.");

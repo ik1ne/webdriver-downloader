@@ -7,9 +7,8 @@ use fantoccini::wd::Capabilities;
 use reqwest::IntoUrl;
 use tempfile::TempDir;
 
-use webdriver_downloader::installation_info::{InstallationError, WebdriverInstallationInfo};
-use webdriver_downloader::url_info::{UrlError, WebdriverUrlInfo, WebdriverVersionUrl};
-use webdriver_downloader::verification_info::{VerificationError, WebdriverVerificationInfo};
+use webdriver_downloader::prelude::*;
+use webdriver_downloader::traits::url_info::WebdriverVersionUrl;
 
 #[derive(Debug)]
 pub struct MockWebdriverDownloadInfo<'a> {
@@ -18,7 +17,7 @@ pub struct MockWebdriverDownloadInfo<'a> {
 
     // installation_info
     pub driver_install_path: &'a Path,
-    pub driver_name_in_archive: &'a str,
+    pub driver_executable_name: &'a str,
     pub download_in_tempdir: Option<PathBuf>,
     pub install_driver: Arc<Mutex<Vec<bool>>>,
 
@@ -32,7 +31,7 @@ impl<'a> MockWebdriverDownloadInfo<'a> {
         MockWebdriverDownloadInfo {
             version_urls: Default::default(),
             driver_install_path: Path::new(""),
-            driver_name_in_archive: Default::default(),
+            driver_executable_name: Default::default(),
             download_in_tempdir: Default::default(),
             install_driver: Default::default(),
             driver_capabilities: Default::default(),
@@ -57,8 +56,8 @@ impl WebdriverInstallationInfo for MockWebdriverDownloadInfo<'_> {
         self.driver_install_path
     }
 
-    fn driver_name_in_archive(&self) -> &str {
-        self.driver_name_in_archive
+    fn driver_executable_name(&self) -> &str {
+        self.driver_executable_name
     }
 
     async fn download_in_tempdir<U: IntoUrl + AsRef<str> + Send>(

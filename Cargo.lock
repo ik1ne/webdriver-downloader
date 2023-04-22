@@ -1777,6 +1777,7 @@ dependencies = [
  "bytes",
  "fantoccini",
  "flate2",
+ "home",
  "lenient_semver",
  "regex",
  "reqwest",
@@ -1786,6 +1787,7 @@ dependencies = [
  "tempfile",
  "thiserror",
  "tokio",
+ "which",
  "zip",
 ]
 
@@ -1797,10 +1799,20 @@ dependencies = [
  "assert_cmd",
  "assert_fs",
  "clap",
- "home",
  "predicates",
  "tokio",
  "webdriver-downloader",
+]
+
+[[package]]
+name = "which"
+version = "4.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2441c784c52b289a054b7201fc93253e288f094e2f4be9058343127c4226a269"
+dependencies = [
+ "either",
+ "libc",
+ "once_cell",
 ]
 
 [[package]]

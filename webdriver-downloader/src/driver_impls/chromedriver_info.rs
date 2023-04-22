@@ -6,12 +6,12 @@ use regex::Regex;
 use semver::{Version, VersionReq};
 use serde_json::{json, Map};
 
-use crate::common::installation_info::WebdriverInstallationInfo;
-use crate::common::url_info::{UrlError, WebdriverVersionUrl};
-use crate::common::verification_info::WebdriverVerificationInfo;
-use crate::common::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
-
-mod os_specific;
+use crate::os_specific;
+use crate::os_specific::DefaultPathError;
+use crate::traits::installation_info::WebdriverInstallationInfo;
+use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
+use crate::traits::verification_info::WebdriverVerificationInfo;
+use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
 /// Information required to implement [WebdriverDownloadInfo](crate::WebdriverDownloadInfo) for Chromedriver.
 pub struct ChromedriverInfo {
@@ -26,12 +26,18 @@ impl ChromedriverInfo {
             browser_path,
         }
     }
+
+    pub fn new_default() -> Result<Self, DefaultPathError> {
+        let driver_install_path = os_specific::chromedriver::default_driver_path()?;
+        let browser_path = os_specific::chromedriver::default_browser_path()?;
+        Ok(ChromedriverInfo::new(driver_install_path, browser_path))
+    }
 }
 
 #[async_trait]
 impl VersionReqUrlInfo for ChromedriverInfo {
     fn binary_version(&self) -> Result<Version, VersionReqError> {
-        os_specific::binary_version(&self.browser_path)
+        os_specific::chromedriver::binary_version(&self.browser_path)
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
@@ -39,7 +45,8 @@ impl VersionReqUrlInfo for ChromedriverInfo {
 
         let xml = reqwest::get(download_xml).await?.text().await?;
 
-        let re = Regex::new(os_specific::ZIPFILE_NAME_RE).expect("Failed to parse regex.");
+        let re =
+            Regex::new(os_specific::chromedriver::ZIPFILE_NAME_RE).expect("Failed to parse regex.");
 
         let mut versions: Vec<WebdriverVersionUrl> = vec![];
         for captures in re.captures_iter(&xml) {
@@ -56,7 +63,7 @@ impl VersionReqUrlInfo for ChromedriverInfo {
             versions.push(WebdriverVersionUrl {
                 version_req,
                 webdriver_version,
-                url: os_specific::build_url(version_str),
+                url: os_specific::chromedriver::build_url(version_str),
             });
         }
 
@@ -69,8 +76,8 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
         &self.driver_install_path
     }
 
-    fn driver_name_in_archive(&self) -> &'static str {
-        os_specific::DRIVER_NAME_IN_ARCHIVE
+    fn driver_executable_name(&self) -> &'static str {
+        os_specific::chromedriver::DRIVER_EXECUTABLE_NAME
     }
 }
 
@@ -91,8 +98,9 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::version_req_url_info::VersionReqUrlInfo;
-    use crate::driver_impls::ChromedriverInfo;
+    use crate::traits::version_req_url_info::VersionReqUrlInfo;
+
+    use super::ChromedriverInfo;
 
     #[test]
     fn test_get_binary_version() {

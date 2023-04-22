@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use semver::{Version, VersionReq};
 
-use crate::common::version_req_url_info::VersionReqError;
+use crate::traits::version_req_url_info::VersionReqError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum UrlError {

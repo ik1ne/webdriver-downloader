@@ -1,5 +1,2 @@
-pub use chromedriver_info::ChromedriverInfo;
-pub use geckodriver_info::GeckodriverInfo;
-
-mod chromedriver_info;
-mod geckodriver_info;
+pub mod chromedriver_info;
+pub mod geckodriver_info;
