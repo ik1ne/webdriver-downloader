@@ -16,25 +16,26 @@ pub async fn run() -> anyhow::Result<String> {
         DriverType::Chrome => {
             let driver_info = ChromedriverInfo::new(args.driver_install_path, args.browser_path);
 
-            install_if_needed(&driver_info, 5)
+            install(&driver_info, 5, args.reinstall)
                 .await
                 .map_err(|e| e.into())
         }
         DriverType::Gecko => {
             let driver_info = GeckodriverInfo::new(args.driver_install_path, args.browser_path);
 
-            install_if_needed(&driver_info, 5)
+            install(&driver_info, 5, args.reinstall)
                 .await
                 .map_err(|e| e.into())
         }
     }
 }
 
-async fn install_if_needed(
+async fn install(
     driver_info: &impl WebdriverDownloadInfo,
     max_tries: usize,
+    force_reinstall: bool,
 ) -> Result<String, WebdriverDownloadError> {
-    if driver_info.is_installed().await {
+    if !force_reinstall && driver_info.is_installed().await {
         Ok("Driver already installed.".to_string())
     } else {
         driver_info.download_verify_install(max_tries).await?;

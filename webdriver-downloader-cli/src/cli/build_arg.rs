@@ -25,18 +25,21 @@ pub(super) fn get_args() -> Result<Args> {
                 .help("path to browser executable. Defaults to default install location."),
         )
         .arg(arg!(--mkdir).help("make directory to driver path"))
+        .arg(arg!(--reinstall).help("force reinstall even if driver is already installed"))
         .get_matches();
 
     let driver_type = get_driver_type(&matches);
     let driver_install_path = get_driver_install_path(&matches, driver_type)?;
     let browser_path = get_browser_path(&matches, driver_type);
     let mkdir = get_mkdir(&matches);
+    let reinstall = get_reinstall(&matches);
 
     Ok(Args {
         driver_type,
         driver_install_path,
         browser_path,
         mkdir,
+        reinstall,
     })
 }
 
@@ -78,4 +81,8 @@ fn get_browser_path(matches: &ArgMatches, driver_type: DriverType) -> PathBuf {
 
 fn get_mkdir(matches: &ArgMatches) -> bool {
     matches.get_flag("mkdir")
+}
+
+fn get_reinstall(matches: &ArgMatches) -> bool {
+    matches.get_flag("reinstall")
 }

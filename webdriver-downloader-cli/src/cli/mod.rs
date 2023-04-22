@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use anyhow::{bail, Result};
+use anyhow::bail;
 
 pub use run::run;
 
@@ -14,6 +14,7 @@ pub(self) struct Args {
     pub driver_install_path: PathBuf,
     pub browser_path: PathBuf,
     pub mkdir: bool,
+    pub reinstall: bool,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -23,7 +24,7 @@ pub(self) enum DriverType {
 }
 
 impl DriverType {
-    fn default_driver_install_path(&self) -> Result<PathBuf> {
+    fn default_driver_install_path(&self) -> anyhow::Result<PathBuf> {
         match home::home_dir() {
             Some(home) => Ok(home.join("bin").join(self.driver_executable_name())),
             None => {
