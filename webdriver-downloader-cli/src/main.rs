@@ -2,7 +2,11 @@ use anyhow::Result;
 
 mod cli;
 
-#[tokio::main]
-async fn main() -> Result<()> {
-    cli::run().await.map(|s| println!("{}", s))
+fn main() -> Result<()> {
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("Failed to create Tokio runtime");
+
+    runtime.block_on(async { cli::run().await.map(|s| println!("{}", s)) })
 }

@@ -18,7 +18,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1"
 clap = { version = "4", features = ["cargo", "string", ] }
-tokio = { version = "1", features = ["macros", "process", "rt-multi-thread", ] }
+tokio = "1"
 webdriver-downloader = { version = "0.10", path = "../webdriver-downloader" }
 
 [dev-dependencies]
