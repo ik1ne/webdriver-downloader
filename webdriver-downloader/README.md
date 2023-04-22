@@ -11,7 +11,7 @@ use webdriver_downloader::prelude::*;
 
 #[tokio::main]
 async fn main() {
-    let driver_info = ChromedriverInfo::try_default().unwrap();
+    let driver_info = ChromedriverInfo::new_default().unwrap();
 
     // Tries up to 5 versions of webdrivers if it is not installed.
     if !driver_info.is_installed() {
