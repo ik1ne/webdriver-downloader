@@ -1,13 +1,13 @@
 [package]
 name = "webdriver-downloader-cli"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Cli Interface for webdriver download."
 repository = "https://github.com/ik1ne/webdriver-downloader"
 homepage = "https://github.com/ik1ne/webdriver-downloader"
 license = "MIT"
-readme = "../README.md"
+readme = "README.md"
 keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", ]
 categories = ["command-line-utilities", "web-programming"]
 
@@ -19,7 +19,7 @@ path = "src/main.rs"
 anyhow = "1"
 clap = { version = "4", features = ["cargo", "string", ] }
 tokio = "1"
-webdriver-downloader = { version = "0.10", path = "../webdriver-downloader" }
+webdriver-downloader = { version = "0.11", path = "../webdriver-downloader" }
 
 [dev-dependencies]
 assert_cmd = "2"
