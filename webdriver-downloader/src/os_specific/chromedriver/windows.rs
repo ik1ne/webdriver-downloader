@@ -11,10 +11,10 @@ pub const DRIVER_EXECUTABLE_NAME: &str = "chromedriver.exe";
 
 pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
     let program_files = std::env::var("ProgramFiles")?;
-    PathBuf::from(format!(
+    Ok(PathBuf::from(format!(
         r"{}\Google\Chrome\Application\chrome.exe",
         program_files
-    ))
+    )))
 }
 
 pub fn build_url(version_string: &str) -> String {

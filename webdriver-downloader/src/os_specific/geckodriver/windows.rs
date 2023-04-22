@@ -10,7 +10,10 @@ pub const DRIVER_EXECUTABLE_NAME: &str = "geckodriver.exe";
 
 pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
     let program_files = std::env::var("ProgramFiles")?;
-    PathBuf::from(format!(r"{}\Mozilla Firefox\firefox.exe", program_files))
+    Ok(PathBuf::from(format!(
+        r"{}\Mozilla Firefox\firefox.exe",
+        program_files
+    )))
 }
 
 pub fn build_url(version_string: &str) -> String {
