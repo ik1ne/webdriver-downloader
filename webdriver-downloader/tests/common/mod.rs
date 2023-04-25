@@ -8,7 +8,6 @@ use reqwest::IntoUrl;
 use tempfile::TempDir;
 
 use webdriver_downloader::prelude::*;
-use webdriver_downloader::traits::url_info::WebdriverVersionUrl;
 
 #[derive(Debug)]
 pub struct MockWebdriverDownloadInfo<'a> {

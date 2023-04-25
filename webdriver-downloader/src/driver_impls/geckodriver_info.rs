@@ -120,22 +120,18 @@ impl WebdriverVerificationInfo for GeckodriverInfo {
 
 #[cfg(test)]
 mod tests {
-    use crate::traits::version_req_url_info::VersionReqUrlInfo;
+    use crate::prelude::*;
 
     use super::GeckodriverInfo;
 
     #[test]
     fn test_get_binary_version() {
-        #[cfg(target_os = "windows")]
-        let browser_path = r"C:\Program Files\Mozilla Firefox\firefox.exe";
-        #[cfg(target_os = "linux")]
-        let browser_path = "/usr/bin/firefox";
-        #[cfg(target_os = "macos")]
-        let browser_path = "/Applications/Firefox.app/Contents/MacOS/firefox";
+        let browser_path = os_specific::geckodriver::default_browser_path()
+            .expect("Failed to get default browser path");
 
         let geckodriver_info = GeckodriverInfo {
             driver_install_path: "".into(),
-            browser_path: browser_path.into(),
+            browser_path,
         };
 
         assert!(geckodriver_info.binary_version().is_ok());

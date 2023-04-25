@@ -110,10 +110,7 @@ mod tests {
     use async_trait::async_trait;
     use semver::{Version, VersionReq};
 
-    use crate::traits::url_info::{UrlError, WebdriverUrlInfo};
-    use crate::traits::version_req_url_info::{
-        VersionReqError, VersionReqUrlInfo, WebdriverVersionUrl,
-    };
+    use crate::prelude::*;
 
     struct MockBinaryMajorVersionHintUrlInfo {
         version_hint: Option<Version>,

@@ -12,6 +12,7 @@ pub mod prelude {
     };
     pub use crate::traits::url_info::{UrlError, WebdriverUrlInfo, WebdriverVersionUrl};
     pub use crate::traits::verification_info::{VerificationError, WebdriverVerificationInfo};
+    pub use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
     pub use crate::traits::webdriver_download_info::{
         WebdriverDownloadError, WebdriverDownloadInfo,
     };
