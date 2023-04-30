@@ -15,8 +15,8 @@ use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
 /// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Geckodriver.
 pub struct GeckodriverInfo {
-    driver_install_path: PathBuf,
-    browser_path: PathBuf,
+    pub driver_install_path: PathBuf,
+    pub browser_path: PathBuf,
 }
 
 impl GeckodriverInfo {
