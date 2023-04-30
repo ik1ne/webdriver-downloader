@@ -8,6 +8,7 @@ use crate::traits::url_info::WebdriverVersionUrl;
 
 use super::url_info::{UrlError, WebdriverUrlInfo};
 
+/// Errors that can occur when implementing [`VersionReqUrlInfo`].
 #[derive(thiserror::Error, Debug)]
 pub enum VersionReqError {
     #[error("Failed to capture regex from string: {0}")]
@@ -31,7 +32,13 @@ pub trait VersionReqUrlInfo: WebdriverUrlInfo {
 
     /// Compares webdrivers based on [`binary_version`](VersionReqUrlInfo::binary_version).
     ///
-    /// Prioritizes same major version to version_hint, and then latest version.
+    /// # Ordering
+    /// ## If `binary_version` is `Some`
+    /// First, the webdriver version that matches `binary_version` is preferred.
+    /// If both match, the highest webdriver version is preferred.
+    ///
+    /// ## If `binary_version` is `None`
+    /// The highest webdriver version is preferred.
     fn compare_driver(
         binary_version: &Version,
         left: &WebdriverVersionUrl,

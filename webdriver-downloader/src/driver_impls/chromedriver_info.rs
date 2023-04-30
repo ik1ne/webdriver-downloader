@@ -13,7 +13,7 @@ use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
 use crate::traits::verification_info::WebdriverVerificationInfo;
 use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
-/// Information required to implement [WebdriverDownloadInfo](crate::WebdriverDownloadInfo) for Chromedriver.
+/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chromedriver.
 pub struct ChromedriverInfo {
     driver_install_path: PathBuf,
     browser_path: PathBuf,
@@ -27,6 +27,11 @@ impl ChromedriverInfo {
         }
     }
 
+    /// Initialize ChromedriverInfo with default paths.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DefaultPathError`] if the default paths cannot be determined.
     pub fn new_default() -> Result<Self, DefaultPathError> {
         let driver_install_path = os_specific::chromedriver::default_driver_path()?;
         let browser_path = os_specific::chromedriver::default_browser_path()?;

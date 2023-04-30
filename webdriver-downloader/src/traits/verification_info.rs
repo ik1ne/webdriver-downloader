@@ -17,6 +17,7 @@ impl Drop for ChildGuard {
     }
 }
 
+/// Error that can occur during verification.
 #[derive(thiserror::Error, Debug)]
 pub enum VerificationError {
     #[error("Failed to start driver: {0}")]

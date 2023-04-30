@@ -13,7 +13,7 @@ use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
 use crate::traits::verification_info::WebdriverVerificationInfo;
 use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
-/// Information required to implement [WebdriverDownloadInfo](crate::WebdriverDownloadInfo) for Geckodriver.
+/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Geckodriver.
 pub struct GeckodriverInfo {
     driver_install_path: PathBuf,
     browser_path: PathBuf,

@@ -10,6 +10,7 @@ use tar::Archive;
 use tempfile::TempDir;
 use zip::ZipArchive;
 
+/// Error that can occur during installation.
 #[derive(thiserror::Error, Debug)]
 pub enum InstallationError {
     #[error("Failed to download driver: {0}")]
@@ -126,6 +127,7 @@ async fn extract_tarball(
     Ok(())
 }
 
+/// Error that can occur during adding execute permission.
 #[derive(thiserror::Error, Debug)]
 pub enum AddExecutePermissionError {
     #[error("Failed to get file metadata: {0}")]

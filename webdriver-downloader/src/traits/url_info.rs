@@ -3,6 +3,7 @@ use semver::{Version, VersionReq};
 
 use crate::traits::version_req_url_info::VersionReqError;
 
+/// Error that can occur while getting the urls.
 #[derive(thiserror::Error, Debug)]
 pub enum UrlError {
     #[error("Failed to download Urls: {0}")]
