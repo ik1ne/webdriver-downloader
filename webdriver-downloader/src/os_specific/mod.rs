@@ -13,9 +13,11 @@ pub enum DefaultPathError {
     HomeDir,
     #[error("Failed to get Program Files directory")]
     ProgramFiles(#[from] std::env::VarError),
-    /// Failed to run `which` command.
+    /// Failed to run `which` command. If which failed due to a missing binary, [`BinaryNotFound`](DefaultPathError::BinaryNotFound) will be returned instead.
     #[error("Failed to run command")]
     Which(#[from] which::Error),
+    #[error("Failed to get browser binary path")]
+    BinaryNotFound,
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),
