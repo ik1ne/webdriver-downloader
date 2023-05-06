@@ -17,7 +17,7 @@ jobs:
     - uses: browser-actions/setup-chrome@v1
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --tests
     - name: Run tests
       run: cargo test --verbose
 
@@ -28,7 +28,7 @@ jobs:
     - uses: browser-actions/setup-chrome@v1
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --tests
     - name: Run tests
       run: cargo test --verbose
 
@@ -39,6 +39,6 @@ jobs:
     - uses: browser-actions/setup-chrome@v1
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --tests
     - name: Run tests
       run: cargo test --verbose
