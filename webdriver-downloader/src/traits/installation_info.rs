@@ -72,7 +72,17 @@ pub trait WebdriverInstallationInfo {
         &self,
         temp_driver_path: &P,
     ) -> Result<(), InstallationError> {
-        fs::rename(temp_driver_path, self.driver_install_path()).map_err(InstallationError::Write)
+        fs::rename(temp_driver_path, self.driver_install_path())
+            .or_else(|e| {
+                // io::ErrorKind::CrossesDevices => try to copy instead
+                if let Some(18) = e.raw_os_error() {
+                    fs::copy(temp_driver_path, self.driver_install_path())
+                        .and_then(|_| fs::remove_file(temp_driver_path))
+                } else {
+                    Err(e)
+                }
+            })
+            .map_err(InstallationError::Write)
     }
 }
 
