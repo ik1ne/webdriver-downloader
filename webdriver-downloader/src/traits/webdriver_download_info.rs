@@ -18,6 +18,9 @@ pub trait WebdriverDownloadInfo:
     /// Check if the driver is installed.
     async fn is_installed(&self) -> bool;
 
+    /// Download, install driver. Skips verification process.
+    async fn download_install(&self) -> Result<(), WebdriverDownloadError>;
+
     /// Download, verify, install driver.
     async fn download_verify_install(&self, max_tries: usize)
         -> Result<(), WebdriverDownloadError>;
@@ -50,6 +53,26 @@ where
     async fn is_installed(&self) -> bool {
         let driver_path = self.driver_install_path();
         self.verify_driver(&driver_path).await.is_ok()
+    }
+
+    async fn download_install(&self) -> Result<(), WebdriverDownloadError> {
+        let mut version_urls = self.version_urls(1).await?;
+        let version_url = version_urls
+            .pop()
+            .ok_or(WebdriverDownloadError::NoVersionPassedVerification(0))?;
+
+        println!(
+            "Trying url for version {}: {}.",
+            version_url.webdriver_version, version_url.url
+        );
+
+        let tempdir = TempDir::new()?;
+
+        let temp_driver_path = self.download_in_tempdir(version_url.url, &tempdir).await?;
+
+        self.install_driver(&temp_driver_path)?;
+
+        Ok(())
     }
 
     async fn download_verify_install(
