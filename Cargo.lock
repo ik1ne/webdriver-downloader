@@ -864,9 +864,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.142"
+version = "0.2.143"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a987beff54b60ffa6d51982e1aa1146bc42f19bd26be28b0586f252fccf5317"
+checksum = "edc207893e85c5d6be840e969b496b53d94cec8be2d501b214f50daa97fa8024"
 
 [[package]]
 name = "linux-raw-sys"
@@ -1760,7 +1760,7 @@ dependencies = [
 
 [[package]]
 name = "webdriver-downloader"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1783,7 +1783,7 @@ dependencies = [
 
 [[package]]
 name = "webdriver-downloader-cli"
-version = "0.5.6"
+version = "0.5.7"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -2003,9 +2003,9 @@ dependencies = [
 
 [[package]]
 name = "zip"
-version = "0.6.4"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0445d0fbc924bb93539b4316c11afb121ea39296f99a3c4c9edad09e3658cdef"
+checksum = "7e92305c174683d78035cbf1b70e18db6329cc0f1b9cae0a52ca90bf5bfe7125"
 dependencies = [
  "aes",
  "byteorder",
