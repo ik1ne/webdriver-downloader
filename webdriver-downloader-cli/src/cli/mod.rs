@@ -8,16 +8,18 @@ mod check_arg;
 mod run;
 
 #[derive(Debug)]
-pub(self) struct Args {
+pub(crate) struct Args {
     pub driver_type: DriverType,
     pub driver_install_path: PathBuf,
     pub browser_path: PathBuf,
+    pub num_tries: usize,
+    pub skip_verification: bool,
     pub mkdir: bool,
     pub reinstall: bool,
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(self) enum DriverType {
+pub(crate) enum DriverType {
     Chrome,
     Gecko,
 }

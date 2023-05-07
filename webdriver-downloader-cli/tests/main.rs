@@ -28,6 +28,32 @@ fn test_passes_no_mkdir() {
         .assert(predicate::path::exists());
 }
 
+/// Test for skip_verification flag
+#[test]
+fn test_passes_skip_verification() {
+    let temp_dir = assert_fs::TempDir::new().unwrap();
+    let mut driver_path = temp_dir.to_path_buf();
+    driver_path.push(CHROMEDRIVER_BIN);
+
+    let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
+    let assert = cmd
+        .args(
+            [
+                OsStr::new("--driver"),
+                driver_path.as_os_str(),
+                OsStr::new("--skip-verify"),
+            ]
+            .iter(),
+        )
+        .assert();
+
+    assert.success();
+    temp_dir
+        .child(CHROMEDRIVER_BIN)
+        .assert(predicate::path::exists());
+}
+
+/// Test for mkdir flag
 #[test]
 fn test_passes_mkdir() {
     let temp_dir = assert_fs::TempDir::new().unwrap();
@@ -53,6 +79,8 @@ fn test_passes_mkdir() {
         .assert(predicate::path::exists());
 }
 
+// Test for reinstall flag
+/// Test for the case where the driver is already installed and reinstall flag is not set.
 #[test]
 fn test_existing_driver() {
     let temp_dir = assert_fs::TempDir::new().unwrap();
@@ -81,6 +109,7 @@ fn test_existing_driver() {
         .assert(predicate::path::exists());
 }
 
+/// Test for the case where the driver is already installed and reinstall flag is set.
 #[test]
 fn test_reinstall() {
     let temp_dir = assert_fs::TempDir::new().unwrap();
@@ -118,6 +147,32 @@ fn test_reinstall() {
         .assert(predicate::path::exists());
 }
 
+// Testcases for failures
+
+/// Test for num_tries
+#[test]
+fn test_fails_0_tries() {
+    let temp_dir = assert_fs::TempDir::new().unwrap();
+    let mut driver_path = temp_dir.to_path_buf();
+    driver_path.push(CHROMEDRIVER_BIN);
+
+    let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
+    let assert = cmd
+        .args(
+            [
+                OsStr::new("--driver"),
+                driver_path.as_os_str(),
+                OsStr::new("--tries"),
+                OsStr::new("0"),
+            ]
+            .iter(),
+        )
+        .assert();
+
+    assert.failure();
+}
+
+/// Test for no parent directory when mkdir flag is not set
 #[test]
 fn test_fails_no_mkdir_and_no_dir() {
     let temp_dir = assert_fs::TempDir::new().unwrap();
@@ -134,6 +189,7 @@ fn test_fails_no_mkdir_and_no_dir() {
     temp_dir.child("new_dir").assert(predicate::path::missing());
 }
 
+/// Test for browser path not found
 #[test]
 fn test_fails_no_browser() {
     let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
