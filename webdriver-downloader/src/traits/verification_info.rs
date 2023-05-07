@@ -47,7 +47,7 @@ pub trait WebdriverVerificationInfo {
             std::process::Command::new(OsStr::new(driver_path.as_ref()))
                 .arg(&format!("--port={}", port))
                 .stdout(std::process::Stdio::null())
-                .stderr(std::process::Stdio::null())
+                .stderr(std::process::Stdio::piped())
                 .spawn()?,
         );
 
