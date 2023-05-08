@@ -1,11 +1,13 @@
 use std::ffi::OsStr;
+use std::io::BufReader;
 use std::path::Path;
 use std::process::Child;
-use std::thread;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
+use std::io::prelude::*;
+use std::thread;
 
 struct ChildGuard(pub Child);
 
@@ -22,6 +24,8 @@ impl Drop for ChildGuard {
 pub enum VerificationError {
     #[error("Failed to start driver: {0}")]
     Start(#[from] std::io::Error),
+    #[error("Webdriver failed to initialize: {0}")]
+    WebdriverInit(String),
     #[error("Failed to connect to driver: {0}")]
     Connect(#[from] fantoccini::error::NewSessionError),
     #[error("Driver test failed to pass: {0}")]
@@ -37,18 +41,17 @@ pub trait WebdriverVerificationInfo {
     /// Some driver options such as browser path can be provided by capabilities.
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
+    /// String that is printed by webdriver when it is started successfully.
+    fn driver_started_stdout_string() -> &'static str;
+
     /// Verifies driver using [test_client](WebdriverVerificationInfo::test_client).
     async fn verify_driver<P: AsRef<Path> + Sync>(
         &self,
         driver_path: &P,
     ) -> Result<(), VerificationError> {
         let port = get_random_available_port();
-        let _child = ChildGuard(
-            std::process::Command::new(OsStr::new(driver_path.as_ref()))
-                .arg(&format!("--port={}", port))
-                .stdout(std::process::Stdio::null())
-                .stderr(std::process::Stdio::piped())
-                .spawn()?,
+        let _child_guard = ChildGuard(
+            wait_for_driver_start(driver_path, port, Self::driver_started_stdout_string()).await?,
         );
 
         thread::sleep(std::time::Duration::from_millis(500));
@@ -80,6 +83,36 @@ pub trait WebdriverVerificationInfo {
 
         Ok(())
     }
+}
+
+async fn wait_for_driver_start<P: AsRef<Path> + Sync>(
+    driver_path: &P,
+    port: u16,
+    initialize_str: &str,
+) -> Result<Child, VerificationError> {
+    let mut child = std::process::Command::new(OsStr::new(driver_path.as_ref()))
+        .arg(&format!("--port={}", port))
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()?;
+    let stdout = child.stdout.take().unwrap();
+    let stderr = child.stderr.take().unwrap();
+
+    let reader = BufReader::new(stdout);
+    for line in reader.lines().flatten() {
+        if line.contains(initialize_str) {
+            return Ok(child);
+        }
+    }
+
+    let reader = BufReader::new(stderr);
+    let err_string = reader
+        .lines()
+        .map(|l| l.unwrap())
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    Err(VerificationError::WebdriverInit(err_string))
 }
 
 fn get_random_available_port() -> u16 {

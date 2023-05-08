@@ -116,6 +116,10 @@ impl WebdriverVerificationInfo for GeckodriverInfo {
 
         Some(capabilities)
     }
+
+    fn driver_started_stdout_string() -> &'static str {
+        "Listening on"
+    }
 }
 
 #[cfg(test)]

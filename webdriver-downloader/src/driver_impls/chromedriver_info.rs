@@ -99,6 +99,10 @@ impl WebdriverVerificationInfo for ChromedriverInfo {
 
         Some(capabilities)
     }
+
+    fn driver_started_stdout_string() -> &'static str {
+        "ChromeDriver was started successfully."
+    }
 }
 
 #[cfg(test)]

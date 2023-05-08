@@ -86,6 +86,10 @@ impl WebdriverVerificationInfo for MockWebdriverDownloadInfo<'_> {
         self.driver_capabilities.clone()
     }
 
+    fn driver_started_stdout_string() -> &'static str {
+        unimplemented!("Not required for mock")
+    }
+
     async fn verify_driver<P: AsRef<Path> + Sync>(
         &self,
         _driver_path: &P,
