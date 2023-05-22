@@ -1,21 +1,9 @@
 use std::ffi::OsStr;
 use std::path::Path;
-use std::process::Child;
-use std::thread;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
-
-struct ChildGuard(pub Child);
-
-impl Drop for ChildGuard {
-    fn drop(&mut self) {
-        if let Err(e) = self.0.kill() {
-            println!("Failed to kill child process: {}", e);
-        }
-    }
-}
 
 /// Error that can occur during verification.
 #[derive(thiserror::Error, Debug)]
@@ -43,15 +31,14 @@ pub trait WebdriverVerificationInfo {
         driver_path: &P,
     ) -> Result<(), VerificationError> {
         let port = get_random_available_port();
-        let _child = ChildGuard(
-            std::process::Command::new(OsStr::new(driver_path.as_ref()))
-                .arg(&format!("--port={}", port))
-                .stdout(std::process::Stdio::null())
-                .stderr(std::process::Stdio::piped())
-                .spawn()?,
-        );
+        let mut child = tokio::process::Command::new(OsStr::new(driver_path.as_ref()))
+            .arg(&format!("--port={}", port))
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::piped())
+            .kill_on_drop(true)
+            .spawn()?;
 
-        thread::sleep(std::time::Duration::from_millis(500));
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
         let client;
         if let Some(capabilities) = self.driver_capabilities() {
@@ -69,6 +56,10 @@ pub trait WebdriverVerificationInfo {
 
         if let Err(e) = client.close().await {
             println!("Failed to close client: {}", e);
+        }
+
+        if let Err(e) = child.kill().await {
+            println!("Failed to kill driver: {}", e);
         }
 
         test_result
