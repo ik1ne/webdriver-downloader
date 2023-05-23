@@ -28,8 +28,9 @@ regex = "1"
 tar = "0.4"
 tempfile = "3"
 thiserror = "1"
+tokio = { version = "1", features = ["process", "time"] }
 which = "4"
 zip = "0.6"
 
 [dev-dependencies]
-tokio = { version = "1", features = ["macros", "rt-multi-thread" ] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
