@@ -1,4 +1,4 @@
-name: Rust
+name: CI
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - uses: browser-actions/setup-chrome@v1
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
@@ -26,7 +26,7 @@ jobs:
 
     steps:
     - uses: browser-actions/setup-chrome@v1
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
@@ -37,7 +37,7 @@ jobs:
 
     steps:
     - uses: browser-actions/setup-chrome@v1
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests

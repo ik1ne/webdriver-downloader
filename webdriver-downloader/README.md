@@ -1,10 +1,15 @@
 # webdriver-downloader
 
+[![Crates.io][crates-badge]][crates-url]
+
+[crates-badge]: https://img.shields.io/crates/v/webdriver-downloader.svg
+[crates-url]: https://crates.io/crates/webdriver-downloader
+
 Library for webdriver download. Supports chromedriver, geckodriver for Windows, Linux and macOS.
 
 ## Usage
 
-### Downloading library provided driver
+### Using library provided driver downloader
 
 ```rust
 use webdriver_downloader::prelude::*;
@@ -29,3 +34,8 @@ By implementing `WebdriverUrlInfo, WebdriverInstallationInfo, WebdriverVerificat
 is automatically implemented for `struct CustomDriverInfo`.
 
 Then you can call `custom_driver_info.download_verify_install(max_attempts)`.
+
+## Notes on runtime
+
+The library's implementation of `WebdriverVerificationInfo::verify_driver` uses `fantoccini` to verify installed driver.
+Since `fantoccini` requires `tokio` as runtime, you need to use `tokio` as runtime to use library provided driver downloader.

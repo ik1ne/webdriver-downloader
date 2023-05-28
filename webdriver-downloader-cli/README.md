@@ -1,4 +1,9 @@
-# webdriver-downloader
+# webdriver-downloader-cli
+
+[![Crates.io][crates-badge]][crates-url]
+
+[crates-badge]: https://img.shields.io/crates/v/webdriver-downloader-cli.svg
+[crates-url]: https://crates.io/crates/webdriver-downloader-cli
 
 Cli Interface for webdriver download. Supports chromedriver, geckodriver for Windows, Linux and macOS.
 
