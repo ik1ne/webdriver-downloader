@@ -4,7 +4,7 @@
 
 
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[mit-url]: https://github.com/ik1ne/webdriver-downloader/blob/master/LICENSE
+[mit-url]: https://github.com/ik1ne/webdriver-downloader/blob/master/LICENSE.md
 [actions-badge]: https://github.com/ik1ne/webdriver-downloader/actions/workflows/ci.yml/badge.svg
 [actions-url]: https://github.com/ik1ne/webdriver-downloader/actions?query=workflow%3ACI+branch%3Amain
 
