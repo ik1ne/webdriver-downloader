@@ -25,7 +25,7 @@ pub trait WebdriverVerificationInfo {
     /// Some driver options such as browser path can be provided by capabilities.
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
-    /// Verifies driver using [test_client](WebdriverVerificationInfo::test_client).
+    /// Verifies driver using [`Self::test_client`].
     async fn verify_driver<P: AsRef<Path> + Sync>(
         &self,
         driver_path: &P,
@@ -65,6 +65,7 @@ pub trait WebdriverVerificationInfo {
         test_result
     }
 
+    /// Tests driver using [`fantoccini::Client`]. Default implementation navigates to `example.com`.
     async fn test_client(client: &fantoccini::Client) -> Result<(), VerificationError> {
         client.goto("https://www.example.com").await?;
         client.find(Locator::Css("html")).await?;

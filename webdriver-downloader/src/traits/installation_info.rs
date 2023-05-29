@@ -32,13 +32,13 @@ pub enum InstallationError {
 /// Provides information for installing driver.
 #[async_trait]
 pub trait WebdriverInstallationInfo {
-    /// Path to install driver.
+    /// Path to install driver to.
     fn driver_install_path(&self) -> &Path;
 
     /// Driver executable name.
     fn driver_executable_name(&self) -> &str;
 
-    /// Downloads url and extracts the driver inside tempdir.
+    /// Downloads url and extracts the driver executable to tempdir.
     async fn download_in_tempdir<U: IntoUrl + AsRef<str> + Send>(
         &self,
         url: U,
@@ -58,7 +58,7 @@ pub trait WebdriverInstallationInfo {
                 extract_zip(content, driver_executable_name, &driver_path)?;
             }
             ArchiveType::TarGz => {
-                extract_tarball(content, driver_executable_name, &driver_path).await?;
+                extract_tarball(content, driver_executable_name, &driver_path)?;
             }
         }
 
@@ -68,6 +68,7 @@ pub trait WebdriverInstallationInfo {
         Ok(driver_path)
     }
 
+    /// installs driver from `temp_dir_path` to [`self.driver_install_path()`](Self::driver_install_path).
     fn install_driver<P: AsRef<Path>>(
         &self,
         temp_driver_path: &P,
@@ -113,7 +114,7 @@ fn extract_zip(
     io::copy(&mut driver_content, &mut driver_file).map_err(InstallationError::Write)
 }
 
-async fn extract_tarball(
+fn extract_tarball(
     content: Cursor<Bytes>,
     driver_executable_name: &str,
     driver_path: &Path,

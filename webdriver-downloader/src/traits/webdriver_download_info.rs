@@ -10,7 +10,7 @@ use crate::traits::verification_info::{VerificationError, WebdriverVerificationI
 
 /// Information required to download, verify, install driver.
 ///
-/// This trait is implemented for all types that implement [WebdriverUrlInfo], [WebdriverInstallationInfo] and [WebdriverVerificationInfo].
+/// This trait is implemented for all types that implement [`WebdriverUrlInfo`], [`WebdriverInstallationInfo`] and [`WebdriverVerificationInfo`].
 #[async_trait]
 pub trait WebdriverDownloadInfo:
     WebdriverUrlInfo + WebdriverInstallationInfo + WebdriverVerificationInfo + Sync

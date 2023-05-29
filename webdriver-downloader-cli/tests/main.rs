@@ -172,6 +172,28 @@ fn test_fails_0_tries() {
     assert.failure();
 }
 
+#[test]
+fn test_fails_negative_tries() {
+    let temp_dir = assert_fs::TempDir::new().unwrap();
+    let mut driver_path = temp_dir.to_path_buf();
+    driver_path.push(CHROMEDRIVER_BIN);
+
+    let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
+    let assert = cmd
+        .args(
+            [
+                OsStr::new("--driver"),
+                driver_path.as_os_str(),
+                OsStr::new("--tries"),
+                OsStr::new("-1"),
+            ]
+            .iter(),
+        )
+        .assert();
+
+    assert.failure();
+}
+
 /// Test for no parent directory when mkdir flag is not set
 #[test]
 fn test_fails_no_mkdir_and_no_dir() {

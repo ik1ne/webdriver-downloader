@@ -24,7 +24,7 @@ pub enum VersionReqError {
 }
 
 /// Provides information for determining which url to download.
-/// This trait uses the version to sort the urls to download.
+/// This trait sort the urls based on the version of the driver.
 #[async_trait]
 pub trait VersionReqUrlInfo: WebdriverUrlInfo {
     /// Version hint. Used by [`VersionReqUrlInfo::compare_driver`].
@@ -32,7 +32,7 @@ pub trait VersionReqUrlInfo: WebdriverUrlInfo {
 
     /// Compares webdrivers based on [`binary_version`](VersionReqUrlInfo::binary_version).
     ///
-    /// # Ordering
+    /// # Default Ordering Implementation
     /// ## If `binary_version` is `Some`
     /// First, the webdriver version that matches `binary_version` is preferred.
     /// If both match, the highest webdriver version is preferred.
