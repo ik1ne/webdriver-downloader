@@ -28,6 +28,6 @@ pub struct WebdriverVersionUrl {
 /// Provides information for determining which url to download.
 #[async_trait]
 pub trait WebdriverUrlInfo {
-    /// Lists viable VersionUrls, up to `limit`.
+    /// Lists viable [`WebdriverVersionUrl`]s, up to `limit`.
     async fn version_urls(&self, limit: usize) -> Result<Vec<WebdriverVersionUrl>, UrlError>;
 }
