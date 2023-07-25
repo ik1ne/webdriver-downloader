@@ -1,9 +1,13 @@
 use std::ffi::OsStr;
 use std::path::Path;
+use std::time::Duration;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
+
+const WEBDRIVER_WAIT_DURATION: Duration = Duration::from_millis(500);
+const MAX_RETRIES: usize = 5;
 
 /// Error that can occur during verification.
 #[derive(thiserror::Error, Debug)]
@@ -38,19 +42,33 @@ pub trait WebdriverVerificationInfo {
             .kill_on_drop(true)
             .spawn()?;
 
-        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+        tokio::time::sleep(WEBDRIVER_WAIT_DURATION).await;
 
-        let client;
-        if let Some(capabilities) = self.driver_capabilities() {
-            client = fantoccini::ClientBuilder::native()
-                .capabilities(capabilities)
-                .connect(&format!("http://localhost:{}", port))
-                .await?;
-        } else {
-            client = fantoccini::ClientBuilder::native()
-                .connect(&format!("http://localhost:{}", port))
-                .await?;
-        }
+        let mut current_tries = 0;
+        let client = loop {
+            let connect_result = if let Some(capabilities) = self.driver_capabilities() {
+                fantoccini::ClientBuilder::native()
+                    .capabilities(capabilities)
+                    .connect(&format!("http://localhost:{}", port))
+                    .await
+            } else {
+                fantoccini::ClientBuilder::native()
+                    .connect(&format!("http://localhost:{}", port))
+                    .await
+            };
+
+            match connect_result {
+                Ok(client) => break client,
+                Err(e) => {
+                    if current_tries >= MAX_RETRIES {
+                        return Err(VerificationError::Connect(e));
+                    }
+
+                    current_tries += 1;
+                    tokio::time::sleep(WEBDRIVER_WAIT_DURATION).await;
+                }
+            }
+        };
 
         let test_result = Self::test_client(&client).await;
 
