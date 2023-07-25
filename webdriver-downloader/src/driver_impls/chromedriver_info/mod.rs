@@ -46,6 +46,7 @@ impl ChromedriverInfo {
         Ok(ChromedriverInfo::new(driver_install_path, browser_path))
     }
 
+    /// Verify that the driver and browser versions match, without making any network requests.
     pub fn verify_driver_offline(&self) -> Result<(), OfflineVerificationError> {
         let driver_version = os_specific::chromedriver::binary_version(&self.driver_install_path)
             .map_err(OfflineVerificationError::DriverVersion)?;
