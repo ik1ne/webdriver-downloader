@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
@@ -7,32 +7,12 @@ use semver::{Version, VersionReq};
 use serde_json::{json, Map};
 
 use crate::os_specific;
-use crate::os_specific::DefaultPathError;
 use crate::traits::installation_info::WebdriverInstallationInfo;
 use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
 use crate::traits::verification_info::WebdriverVerificationInfo;
 use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
-/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Geckodriver.
-pub struct GeckodriverInfo {
-    pub driver_install_path: PathBuf,
-    pub browser_path: PathBuf,
-}
-
-impl GeckodriverInfo {
-    pub fn new(driver_install_path: PathBuf, browser_path: PathBuf) -> Self {
-        GeckodriverInfo {
-            driver_install_path,
-            browser_path,
-        }
-    }
-
-    pub fn new_default() -> Result<Self, DefaultPathError> {
-        let driver_install_path = os_specific::geckodriver::default_driver_path()?;
-        let browser_path = os_specific::geckodriver::default_browser_path()?;
-        Ok(GeckodriverInfo::new(driver_install_path, browser_path))
-    }
-}
+use super::GeckodriverInfo;
 
 #[async_trait]
 impl VersionReqUrlInfo for GeckodriverInfo {
@@ -120,9 +100,8 @@ impl WebdriverVerificationInfo for GeckodriverInfo {
 
 #[cfg(test)]
 mod tests {
+    use crate::prelude::GeckodriverInfo;
     use crate::prelude::*;
-
-    use super::GeckodriverInfo;
 
     #[test]
     fn test_get_binary_version() {
