@@ -32,13 +32,8 @@ pub trait VersionReqUrlInfo: WebdriverUrlInfo {
 
     /// Compares webdrivers based on [`binary_version`](VersionReqUrlInfo::binary_version).
     ///
-    /// # Default Ordering Implementation
-    /// ## If `binary_version` is `Some`
-    /// First, the webdriver version that matches `binary_version` is preferred.
-    /// If both match, the highest webdriver version is preferred.
-    ///
-    /// ## If `binary_version` is `None`
-    /// The highest webdriver version is preferred.
+    /// Webdriver version that matches `binary_version`'s major version is preferred.
+    /// If both versions match the binary version, higher webdriver version is preferred.
     fn compare_driver(
         binary_version: &Version,
         left: &WebdriverVersionUrl,
