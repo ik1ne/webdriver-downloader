@@ -1,19 +1,10 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use semver::Version;
 
 use crate::os_specific;
 use crate::os_specific::DefaultPathError;
 use crate::traits::version_req_url_info::VersionReqError;
-use crate::traits::version_req_url_info::VersionReqUrlInfo;
-
-mod trait_impls;
-
-/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chromedriver.
-pub struct ChromedriverInfo {
-    pub driver_install_path: PathBuf,
-    pub browser_path: PathBuf,
-}
 
 #[derive(thiserror::Error, Debug)]
 pub enum OfflineVerificationError {
@@ -27,29 +18,45 @@ pub enum OfflineVerificationError {
     Other(#[from] anyhow::Error),
 }
 
+/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chromedriver.
+/// This works on both old and new Chromedriver.
+pub struct ChromedriverInfo {
+    old_info: Option<ChromedriverOldInfo>,
+    new_info: Option<ChromedriverForTestingInfo>,
+}
+
 impl ChromedriverInfo {
+    pub fn is_chrome_for_testing(path: &Path) -> bool {
+    }
+    
     pub fn new(driver_install_path: PathBuf, browser_path: PathBuf) -> Self {
-        ChromedriverInfo {
-            driver_install_path,
-            browser_path,
-        }
+        
     }
 
     /// Initialize ChromedriverInfo with default paths.
+    /// Searches for the new Chromedriver(Chrome for Testing) first, then the old Chromedriver.
     ///
     /// # Errors
     ///
     /// Returns [`DefaultPathError`] if the default paths cannot be determined.
     pub fn new_default() -> Result<Self, DefaultPathError> {
-        let driver_install_path = os_specific::chromedriver::default_driver_path()?;
-        let browser_path = os_specific::chromedriver::default_browser_path()?;
-        Ok(ChromedriverInfo::new(driver_install_path, browser_path))
+        let driver_install_path = os_specific::chromedriver_for_testing::default_driver_path()?;
+        let browser_path = os_specific::chromedriver_for_testing::default_browser_path()?;
+
+        if browser_path.exists() {
+            Ok(ChromedriverInfo::new(driver_install_path, browser_path))
+        } else {
+            let driver_install_path = os_specific::chromedriver_old::default_driver_path()?;
+            let browser_path = os_specific::chromedriver_old::default_browser_path()?;
+            Ok(ChromedriverInfo::new(driver_install_path, browser_path))
+        }
     }
 
     /// Verify that the driver and browser versions match, without making any network requests.
     pub fn verify_driver_offline(&self) -> Result<(), OfflineVerificationError> {
-        let driver_version = os_specific::chromedriver::binary_version(&self.driver_install_path)
-            .map_err(OfflineVerificationError::DriverVersion)?;
+        let driver_version =
+            os_specific::chromedriver_old::binary_version(&self.driver_install_path)
+                .map_err(OfflineVerificationError::DriverVersion)?;
         let binary_version = self
             .binary_version()
             .map_err(OfflineVerificationError::BinaryVersion)?;

@@ -27,14 +27,14 @@ pub(crate) enum DriverType {
 impl DriverType {
     fn default_driver_install_path(&self) -> Result<PathBuf, os_specific::DefaultPathError> {
         match self {
-            DriverType::Chrome => os_specific::chromedriver::default_driver_path(),
+            DriverType::Chrome => os_specific::chromedriver_old::default_driver_path(),
             DriverType::Gecko => os_specific::geckodriver::default_driver_path(),
         }
     }
 
     fn default_browser_path(&self) -> Result<PathBuf, os_specific::DefaultPathError> {
         match self {
-            DriverType::Chrome => os_specific::chromedriver::default_browser_path(),
+            DriverType::Chrome => os_specific::chromedriver_old::default_browser_path(),
             DriverType::Gecko => os_specific::geckodriver::default_browser_path(),
         }
     }

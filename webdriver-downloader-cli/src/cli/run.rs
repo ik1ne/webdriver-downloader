@@ -11,7 +11,7 @@ pub async fn run() -> anyhow::Result<String> {
 
     let install_result = match args.driver_type {
         DriverType::Chrome => {
-            let driver_info = ChromedriverInfo::new(args.driver_install_path, args.browser_path);
+            let driver_info = ChromedriverOldInfo::new(args.driver_install_path, args.browser_path);
 
             install(
                 &driver_info,

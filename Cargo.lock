@@ -1777,6 +1777,7 @@ dependencies = [
  "regex",
  "reqwest",
  "semver",
+ "serde",
  "serde_json",
  "tar",
  "tempfile",

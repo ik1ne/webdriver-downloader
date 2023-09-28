@@ -10,7 +10,7 @@ use predicates::str::ends_with;
 
 use webdriver_downloader::prelude::*;
 
-const CHROMEDRIVER_BIN: &str = os_specific::chromedriver::DRIVER_EXECUTABLE_NAME;
+const CHROMEDRIVER_BIN: &str = os_specific::chromedriver_old::DRIVER_EXECUTABLE_NAME;
 
 fn download_driver_to_temp_dir() -> (TempDir, PathBuf) {
     let temp_dir = TempDir::new().unwrap();
