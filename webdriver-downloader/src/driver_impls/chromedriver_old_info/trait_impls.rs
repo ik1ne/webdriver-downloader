@@ -17,7 +17,7 @@ use super::ChromedriverOldInfo;
 #[async_trait]
 impl VersionReqUrlInfo for ChromedriverOldInfo {
     fn binary_version(&self) -> Result<Version, VersionReqError> {
-        os_specific::chromedriver_old::binary_version(&self.browser_path)
+        os_specific::chromedriver::binary_version(&self.browser_path)
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
@@ -57,7 +57,7 @@ impl WebdriverInstallationInfo for ChromedriverOldInfo {
     }
 
     fn driver_executable_name(&self) -> &'static str {
-        os_specific::chromedriver_old::DRIVER_EXECUTABLE_NAME
+        os_specific::chromedriver::DRIVER_EXECUTABLE_NAME
     }
 }
 

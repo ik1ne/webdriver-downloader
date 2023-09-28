@@ -1,6 +1,3 @@
-#[cfg(target_family = "unix")]
-pub use unix_family::*;
-
 #[cfg(target_os = "linux")]
 pub use linux::*;
 #[cfg(target_os = "macos")]
@@ -14,6 +11,3 @@ mod linux;
 mod macos;
 #[cfg(target_os = "windows")]
 mod windows;
-
-#[cfg(target_family = "unix")]
-mod unix_family;

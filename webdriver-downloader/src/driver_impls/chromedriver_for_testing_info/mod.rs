@@ -27,7 +27,7 @@ impl ChromedriverForTestingInfo {
     ///
     /// Returns [`DefaultPathError`] if the default paths cannot be determined.
     pub fn new_default() -> Result<Self, DefaultPathError> {
-        let driver_install_path = os_specific::chromedriver_for_testing::default_driver_path()?;
+        let driver_install_path = os_specific::chromedriver::default_driver_path()?;
         let browser_path = os_specific::chromedriver_for_testing::default_browser_path()?;
 
         Ok(ChromedriverForTestingInfo::new(
@@ -38,9 +38,8 @@ impl ChromedriverForTestingInfo {
 
     /// Verify that the driver and browser versions match, without making any network requests.
     pub fn verify_driver_offline(&self) -> Result<(), OfflineVerificationError> {
-        let driver_version =
-            os_specific::chromedriver_old::binary_version(&self.driver_install_path)
-                .map_err(OfflineVerificationError::DriverVersion)?;
+        let driver_version = os_specific::chromedriver::binary_version(&self.driver_install_path)
+            .map_err(OfflineVerificationError::DriverVersion)?;
         let binary_version = self
             .binary_version()
             .map_err(OfflineVerificationError::BinaryVersion)?;
