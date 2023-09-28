@@ -108,6 +108,17 @@ fn extract_zip(
     driver_path: &Path,
 ) -> Result<u64, InstallationError> {
     let mut archive = ZipArchive::new(content)?;
+
+    let file_names = archive.file_names().map(str::to_string).collect::<Vec<_>>();
+
+    for file_name in file_names {
+        if file_name.ends_with(driver_executable_name) {
+            let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
+            let mut driver_content = archive.by_name(&file_name)?;
+            return io::copy(&mut driver_content, &mut driver_file)
+                .map_err(InstallationError::Write);
+        }
+    }
     let mut driver_content = archive.by_name(driver_executable_name)?;
 
     let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
