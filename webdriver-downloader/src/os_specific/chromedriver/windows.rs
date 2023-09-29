@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::path::Path;
 
 use semver::Version;
