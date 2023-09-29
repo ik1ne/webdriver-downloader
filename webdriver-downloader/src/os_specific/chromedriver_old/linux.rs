@@ -4,9 +4,6 @@ use which::{which, Error};
 
 use crate::os_specific::DefaultPathError;
 
-pub const PLATFORM: &str = "linux64";
-
-
 pub const BROWSER_EXECUTABLE_NAMES: &[&str] =
     &["google-chrome", "chrome", "chromium", "chromium-browser"];
 
