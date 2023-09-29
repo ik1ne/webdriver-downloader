@@ -1,5 +1,5 @@
 [workspace]
-
+resolver = "2"
 members = [
     "webdriver-downloader-cli",
     "webdriver-downloader",

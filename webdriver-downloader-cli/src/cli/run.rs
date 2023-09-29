@@ -1,3 +1,5 @@
+use webdriver_downloader::driver_impls::chromedriver_info::ChromedriverInfo;
+
 use super::build_arg::*;
 use super::check_arg::*;
 use super::*;

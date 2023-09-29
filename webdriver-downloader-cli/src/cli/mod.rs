@@ -34,7 +34,15 @@ impl DriverType {
 
     fn default_browser_path(&self) -> Result<PathBuf, os_specific::DefaultPathError> {
         match self {
-            DriverType::Chrome => os_specific::chromedriver::default_browser_path(),
+            DriverType::Chrome => {
+                let path_chrome_for_testing =
+                    os_specific::chromedriver_for_testing::default_browser_path()?;
+                if path_chrome_for_testing.exists() {
+                    Ok(path_chrome_for_testing)
+                } else {
+                    os_specific::chromedriver_old::default_browser_path()
+                }
+            }
             DriverType::Gecko => os_specific::geckodriver::default_browser_path(),
         }
     }

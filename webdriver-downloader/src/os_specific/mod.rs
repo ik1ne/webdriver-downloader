@@ -4,6 +4,8 @@
 //! operating system.
 
 pub mod chromedriver;
+pub mod chromedriver_for_testing;
+pub mod chromedriver_old;
 pub mod geckodriver;
 
 /// Errors that can occur when getting the default path for a webdriver.

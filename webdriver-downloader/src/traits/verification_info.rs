@@ -7,7 +7,7 @@ use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
 
 const WEBDRIVER_WAIT_DURATION: Duration = Duration::from_millis(500);
-const MAX_RETRIES: usize = 5;
+const MAX_RETRIES: usize = 10;
 
 /// Error that can occur during verification.
 #[derive(thiserror::Error, Debug)]

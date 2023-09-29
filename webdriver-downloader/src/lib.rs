@@ -15,7 +15,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), WebdriverDownloadError> {
-//!     let chromedriver_info = ChromedriverInfo::new_default()?;
+//!     let chromedriver_info = ChromedriverOldInfo::new_default()?;
 //!
 //!     if !chromedriver_info.is_installed().await {
 //!        chromedriver_info.download_verify_install(5).await?;
@@ -27,7 +27,7 @@
 //!
 //! This will download the latest version of chromedriver, verify it, and install
 //! it to the default location.
-//! See [`default_install_path`](os_specific::chromedriver::default_driver_path)s for default install locations.
+//! See [`default_install_path`](os_specific::chromedriver_old::default_driver_path)s for default install locations.
 //!
 //! # Implementing your own webdriver
 //!
@@ -42,7 +42,7 @@ pub mod traits;
 /// necessary imports for using library provided driver implementations.
 pub mod prelude {
     pub use crate::driver_impls::{
-        chromedriver_info::ChromedriverInfo, geckodriver_info::GeckodriverInfo,
+        chromedriver_old_info::ChromedriverOldInfo, geckodriver_info::GeckodriverInfo,
     };
     pub use crate::os_specific;
     pub use crate::traits::installation_info::{

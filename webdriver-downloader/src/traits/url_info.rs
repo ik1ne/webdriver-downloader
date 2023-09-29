@@ -15,6 +15,8 @@ pub enum UrlError {
     #[error(transparent)]
     Version(#[from] lenient_semver::parser::OwnedError),
     #[error(transparent)]
+    JsonParse(#[from] serde_json::Error),
+    #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 

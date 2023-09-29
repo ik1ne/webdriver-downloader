@@ -25,3 +25,4 @@ webdriver-downloader = { version = "0.13", path = "../webdriver-downloader" }
 assert_cmd = "2"
 assert_fs = "1"
 predicates = "3"
+tokio = { version = "1", features = ["macros", ] }

@@ -35,7 +35,7 @@ impl VersionReqUrlInfo for GeckodriverInfo {
         // parses <tr>  <td>0.33.0  <td>≥ 3.11 (3.14 Python)  <td>102 ESR  <td>n/a
         // or <tr>  <td>0.19.0  <td>≥ 3.5  <td>55  <td>62
         let re = Regex::new(
-            r#"<tr>\s*<td>([0-9.]*?)\s*<td>[^<]*<td>([0-9.]*?)( ESR)?\s*<td>([0-9.]*|n/a)"#,
+            r"<tr>\s*<td>([0-9.]*?)\s*<td>[^<]*<td>([0-9.]*?)( ESR)?\s*<td>([0-9.]*|n/a)",
         )
         .unwrap();
 
