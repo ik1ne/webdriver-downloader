@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader-cli"
-version = "0.5.12"
+version = "0.5.13"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Cli for webdriver download."
@@ -19,7 +19,7 @@ path = "src/main.rs"
 anyhow = "1"
 clap = { version = "4", features = ["cargo", "string", ] }
 tokio = "1"
-webdriver-downloader = { version = "0.13", path = "../webdriver-downloader" }
+webdriver-downloader = { version = "0.14", path = "../webdriver-downloader" }
 
 [dev-dependencies]
 assert_cmd = "2"

@@ -1765,7 +1765,7 @@ dependencies = [
 
 [[package]]
 name = "webdriver-downloader"
-version = "0.13.6"
+version = "0.14.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1789,7 +1789,7 @@ dependencies = [
 
 [[package]]
 name = "webdriver-downloader-cli"
-version = "0.5.12"
+version = "0.5.13"
 dependencies = [
  "anyhow",
  "assert_cmd",
