@@ -5,7 +5,7 @@
 [crates-badge]: https://img.shields.io/crates/v/webdriver-downloader.svg
 [crates-url]: https://crates.io/crates/webdriver-downloader
 
-Library for webdriver download. Supports chromedriver, geckodriver for Windows, Linux and macOS.
+Library for webdriver download. Supports chromedriver(both Chrome and Chrome for Testing), geckodriver for Windows, Linux and macOS.
 
 ## Usage
 

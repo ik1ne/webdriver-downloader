@@ -5,7 +5,7 @@
 [crates-badge]: https://img.shields.io/crates/v/webdriver-downloader-cli.svg
 [crates-url]: https://crates.io/crates/webdriver-downloader-cli
 
-Cli for webdriver download. Supports chromedriver, geckodriver for Windows, Linux and macOS.
+Cli for webdriver download. Supports chromedriver(both Chrome and Chrome for Testing), geckodriver for Windows, Linux and macOS.
 
 ## Usage
 
@@ -14,6 +14,8 @@ Cli for webdriver download. Supports chromedriver, geckodriver for Windows, Linu
 cargo install webdriver-downloader-cli
 
 # Installs chromedriver into %USERPROFILE%/bin/chromedriver.exe ($HOME/bin/chromedriver for unix family)
+# If Chrome for Testing is installed, chromedriver for Chrome for Testing will be installed.
+# Otherwise, chromedriver for Chrome will be installed.
 webdriver-downloader.exe
 
 # You can specify path to install driver to. Adding mkdir flag will create the parent directory.
