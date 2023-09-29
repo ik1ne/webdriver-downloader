@@ -89,9 +89,11 @@ fn test_passes_mkdir() {
 
 // Test for reinstall flag
 /// Test for the case where the driver is already installed and reinstall flag is not set.
-#[test]
-fn test_existing_driver() {
+#[tokio::test]
+async fn test_existing_driver() {
     let (temp_dir, driver_path) = download_driver_to_temp_dir();
+
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
     let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
     let assert = cmd
@@ -106,9 +108,11 @@ fn test_existing_driver() {
 }
 
 /// Test for the case where the driver is already installed and reinstall flag is set.
-#[test]
-fn test_reinstall() {
+#[tokio::test]
+async fn test_reinstall() {
     let (temp_dir, driver_path) = download_driver_to_temp_dir();
+
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
     let mut cmd = Command::cargo_bin("webdriver-downloader").unwrap();
     let assert = cmd
