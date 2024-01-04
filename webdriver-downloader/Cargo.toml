@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader"
-version = "0.14.0"
+version = "0.14.1"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Library for webdriver download."
@@ -30,7 +30,7 @@ tar = "0.4"
 tempfile = "3"
 thiserror = "1"
 tokio = { version = "1", features = ["process", "time"] }
-which = "4"
+which = "5"
 zip = "0.6"
 
 [dev-dependencies]
