@@ -1,3 +1,4 @@
+use std::ffi::OsStr;
 use std::fs;
 use std::fs::File;
 use std::io::{self, Cursor};
@@ -111,8 +112,11 @@ fn extract_zip(
 
     let file_names = archive.file_names().map(str::to_string).collect::<Vec<_>>();
 
+    // file_names are actually file_paths
     for file_name in file_names {
-        if file_name.ends_with(driver_executable_name) {
+        let file_path = Path::new(&file_name);
+        let real_file_name = file_path.file_name();
+        if real_file_name == Some(OsStr::new(driver_executable_name)) {
             let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
             let mut driver_content = archive.by_name(&file_name)?;
             return io::copy(&mut driver_content, &mut driver_file)
@@ -135,11 +139,9 @@ fn extract_tarball(
 
     for entry_result in archive.entries().map_err(InstallationError::ExtractTar)? {
         let mut entry = entry_result.map_err(InstallationError::ExtractTar)?;
-        if entry
-            .path()
-            .map_err(InstallationError::ExtractTar)?
-            .ends_with(driver_executable_name)
-        {
+        let entry_path = entry.path().map_err(InstallationError::ExtractTar)?;
+        let entry_file_name = entry_path.file_name();
+        if entry_file_name == Some(OsStr::new(driver_executable_name)) {
             let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
             io::copy(&mut entry, &mut driver_file).map_err(InstallationError::Write)?;
             break;
