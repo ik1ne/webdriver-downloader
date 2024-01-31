@@ -27,4 +27,4 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose --package webdriver-downloader-cli --test main test_geckodriver -- --exact
+      run: cargo test --verbose
