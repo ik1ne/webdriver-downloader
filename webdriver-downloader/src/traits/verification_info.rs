@@ -45,14 +45,18 @@ pub trait WebdriverVerificationInfo {
         tokio::time::sleep(WEBDRIVER_WAIT_DURATION).await;
 
         let mut current_tries = 0;
+        #[cfg(feature = "native-tls")]
+        let new_client_builder = || fantoccini::ClientBuilder::native();
+        #[cfg(feature = "rustls-tls")]
+        let new_client_builder = || fantoccini::ClientBuilder::rustls();
         let client = loop {
             let connect_result = if let Some(capabilities) = self.driver_capabilities() {
-                fantoccini::ClientBuilder::native()
+                new_client_builder()
                     .capabilities(capabilities)
                     .connect(&format!("http://localhost:{}", port))
                     .await
             } else {
-                fantoccini::ClientBuilder::native()
+                new_client_builder()
                     .connect(&format!("http://localhost:{}", port))
                     .await
             };
