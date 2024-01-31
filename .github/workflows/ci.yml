@@ -14,8 +14,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: browser-actions/setup-firefox@v1
-    - run: firefox --version
     - uses: actions/cache@v3
       with:
         path: |
@@ -29,4 +27,4 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose -- --test-threads=1
