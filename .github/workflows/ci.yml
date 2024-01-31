@@ -31,6 +31,7 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    permissions: write-all
 
     steps:
     - uses: actions/cache@v3
