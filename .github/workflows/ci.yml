@@ -10,6 +10,25 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose --tests
+    - name: Run tests
+      run: cargo test --verbose
+
   windows:
     runs-on: windows-latest
 
@@ -28,3 +47,22 @@ jobs:
       run: cargo build --verbose --tests
     - name: Run tests
       run: cargo test --verbose -- --test-threads=1
+
+  macos:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose --tests
+    - name: Run tests
+      run: cargo test --verbose
