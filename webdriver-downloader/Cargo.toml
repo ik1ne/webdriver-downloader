@@ -8,7 +8,7 @@ repository = "https://github.com/ik1ne/webdriver-downloader"
 homepage = "https://github.com/ik1ne/webdriver-downloader"
 license = "MIT"
 readme = "README.md"
-keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver"]
+keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", ]
 categories = ["web-programming"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -17,14 +17,14 @@ categories = ["web-programming"]
 anyhow = "1"
 bytes = "1"
 async-trait = "0.1"
-fantoccini = { version = "0.19", default-features = false }
+fantoccini = "0.19"
 flate2 = "1.0"
 home = "0.5"
 lenient_semver = "0.4"
 semver = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-reqwest = { version = "0.11", default-features = false }
+reqwest = "0.11"
 regex = "1"
 tar = "0.4"
 tempfile = "3"
@@ -35,8 +35,3 @@ zip = "0.6"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-
-[features]
-default = ["native-tls"]
-native-tls = ["fantoccini/native-tls", "reqwest/native-tls"]
-rustls-tls = ["fantoccini/rustls-tls", "reqwest/rustls-tls"]
