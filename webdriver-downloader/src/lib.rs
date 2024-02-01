@@ -48,7 +48,7 @@ webdriver-downloader = { version = "...", default-features = false, features = [
 ```
 
 To learn more about features in Cargo, see <https://doc.rust-lang.org/cargo/reference/features.html>.
-To find out which dependency enabled the mutually exclusive features, run `cargo tree -e features -i webdriver-downloader`.
+To find out which dependenc(-y|-ies) enabled the mutually exclusive features, run `cargo tree -e features -i webdriver-downloader`.
 "#);
 
 pub mod driver_impls;
