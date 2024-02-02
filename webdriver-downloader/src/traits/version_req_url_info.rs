@@ -64,7 +64,6 @@ where
             match self.binary_version() {
                 Ok(version_hint) => Box::new(
                     move |left: &WebdriverVersionUrl, right: &WebdriverVersionUrl| {
-                        left.version_req.comparators.get(0).unwrap().to_string();
                         Self::compare_driver(&version_hint, left, right)
                     },
                 ),

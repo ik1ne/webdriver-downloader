@@ -46,17 +46,17 @@ pub trait WebdriverVerificationInfo {
 
         let mut current_tries = 0;
         #[cfg(feature = "native-tls")]
-        let new_client_builder = || fantoccini::ClientBuilder::native();
+        let mut new_client = fantoccini::ClientBuilder::native();
         #[cfg(feature = "rustls-tls")]
-        let new_client_builder = || fantoccini::ClientBuilder::rustls();
+        let mut new_client = fantoccini::ClientBuilder::rustls();
         let client = loop {
             let connect_result = if let Some(capabilities) = self.driver_capabilities() {
-                new_client_builder()
+                new_client
                     .capabilities(capabilities)
                     .connect(&format!("http://localhost:{}", port))
                     .await
             } else {
-                new_client_builder()
+                new_client
                     .connect(&format!("http://localhost:{}", port))
                     .await
             };
