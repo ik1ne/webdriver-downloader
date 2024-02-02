@@ -1,4 +1,4 @@
-#![deny(rustdoc::broken_intra_doc_links)] // error if there are broken intra-doc links
+#![deny(rustdoc::broken_intra_doc_links)]
 
 //! A library for downloading and installing webdrivers.
 //!
@@ -32,6 +32,25 @@
 //! # Implementing your own webdriver
 //!
 //! See [`traits`] for more information on how to implement your own webdriver.
+
+#[cfg(all(feature = "rustls-tls", feature = "native-tls"))]
+#[rustfmt::skip]
+compile_error!(
+r#"The `rustls-tls` and `native-tls` features are mutually exclusive.
+These two features could have been enabled simultaneously, for example, if you forgot to disable the default `native-tls` feature.
+In order to use <https://github.com/rustls/rustls>, you must disable the `native-tls` feature.
+
+For example,
+
+```toml
+[dependencies]
+webdriver-downloader = { version = "...", default-features = false, features = ["rustls-tls"] }
+```
+
+To learn more about features in Cargo, see <https://doc.rust-lang.org/cargo/reference/features.html>.
+To find out which crate(s) enabled the mutually exclusive features of `webdriver-downloader`, run `cargo tree -e features -i webdriver-downloader`.
+"#);
+
 pub mod driver_impls;
 pub mod os_specific;
 pub mod traits;
