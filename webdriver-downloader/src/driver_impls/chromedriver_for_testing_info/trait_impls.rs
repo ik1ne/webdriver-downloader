@@ -119,12 +119,14 @@ impl WebdriverVerificationInfo for ChromedriverForTestingInfo {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Result;
+
     use crate::prelude::*;
 
     use super::ChromedriverForTestingInfo;
 
     #[test]
-    fn test_get_binary_version() {
+    fn test_get_binary_version() -> Result<()> {
         let browser_path = os_specific::chromedriver_for_testing::default_browser_path()
             .expect("Failed to get default browser path");
 
@@ -133,6 +135,8 @@ mod tests {
             browser_path,
         };
 
-        assert!(chromedriver_info.binary_version().is_ok());
+        chromedriver_info.binary_version()?;
+
+        Ok(())
     }
 }
