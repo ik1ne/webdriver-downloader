@@ -1,4 +1,5 @@
 use std::ffi::OsStr;
+use std::fmt::Debug;
 use std::path::Path;
 use std::time::Duration;
 
@@ -30,7 +31,8 @@ pub trait WebdriverVerificationInfo {
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
     /// Verifies driver using [`Self::test_client`].
-    async fn verify_driver<P: AsRef<Path> + Sync>(
+    #[tracing::instrument(skip(self))]
+    async fn verify_driver<P: AsRef<Path> + Debug + Sync>(
         &self,
         driver_path: &P,
     ) -> Result<(), VerificationError> {

@@ -27,7 +27,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
 
   windows:
     runs-on: windows-latest
@@ -46,7 +46,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
 
   macos:
     runs-on: macos-latest
@@ -65,4 +65,4 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose

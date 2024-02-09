@@ -30,6 +30,7 @@ tar = "0.4"
 tempfile = "3"
 thiserror = "1"
 tokio = { version = "1", features = ["process", "time"] }
+tracing = "0.1"
 which = "6"
 zip = "0.6"
 
