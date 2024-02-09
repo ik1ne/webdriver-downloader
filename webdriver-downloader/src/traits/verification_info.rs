@@ -1,4 +1,5 @@
 use std::ffi::OsStr;
+use std::fmt::Debug;
 use std::path::Path;
 use std::time::Duration;
 
@@ -30,7 +31,8 @@ pub trait WebdriverVerificationInfo {
     fn driver_capabilities(&self) -> Option<Capabilities>;
 
     /// Verifies driver using [`Self::test_client`].
-    async fn verify_driver<P: AsRef<Path> + Sync>(
+    #[tracing::instrument(skip(self))]
+    async fn verify_driver<P: AsRef<Path> + Debug + Sync>(
         &self,
         driver_path: &P,
     ) -> Result<(), VerificationError> {
@@ -108,10 +110,12 @@ fn get_random_available_port() -> u16 {
 mod tests {
     use std::net::TcpListener;
 
+    use anyhow::Result;
+
     use super::get_random_available_port;
 
     #[test]
-    fn test_get_random_available_port() {
+    fn test_get_random_available_port() -> Result<()> {
         let port = get_random_available_port();
 
         // Check if the port number is within the valid range
@@ -119,10 +123,8 @@ mod tests {
 
         // Check if the port is actually available
         let addr = format!("127.0.0.1:{}", port);
-        let listener_result = TcpListener::bind(addr);
-        assert!(
-            listener_result.is_ok(),
-            "Port number should be available for binding"
-        );
+        TcpListener::bind(addr)?;
+
+        Ok(())
     }
 }

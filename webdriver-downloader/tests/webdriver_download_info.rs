@@ -1,5 +1,7 @@
-use semver::Version;
 use std::sync::{Arc, Mutex};
+
+use anyhow::Result;
+use semver::Version;
 
 use common::MockWebdriverDownloadInfo;
 use webdriver_downloader::prelude::*;
@@ -12,11 +14,11 @@ async fn fails_when_0_max_tries() {
     mock.version_urls = Some(vec![]);
 
     let result = mock.download_verify_install(0).await;
-    assert!(result.is_err());
+    result.unwrap_err();
 }
 
 #[tokio::test]
-async fn passes_when_one_version_passes() {
+async fn passes_when_one_version_passes() -> Result<()> {
     let mut mock = MockWebdriverDownloadInfo::new();
     let version_count = 5;
 
@@ -32,8 +34,9 @@ async fn passes_when_one_version_passes() {
     mock.verify_driver = Arc::new(Mutex::new(vec![false, false, false, false, true]));
     mock.install_driver = Arc::new(Mutex::new(vec![true; version_count]));
 
-    let result = mock.download_verify_install(version_count).await;
-    assert!(result.is_ok());
+    mock.download_verify_install(version_count).await?;
+
+    Ok(())
 }
 
 #[tokio::test]
@@ -53,7 +56,7 @@ async fn fails_when_all_versions_fail() {
     mock.verify_driver = Arc::new(Mutex::new(vec![false; 5]));
 
     let result = mock.download_verify_install(version_count).await;
-    assert!(result.is_err());
+    result.unwrap_err();
 }
 
 #[tokio::test]
@@ -73,6 +76,7 @@ async fn fails_when_installation_fails() {
     mock.verify_driver = Arc::new(Mutex::new(vec![true; 5]));
     mock.install_driver = Arc::new(Mutex::new(vec![false; 5]));
 
-    let result = mock.download_verify_install(version_count).await;
-    assert!(result.is_err());
+    mock.download_verify_install(version_count)
+        .await
+        .unwrap_err();
 }

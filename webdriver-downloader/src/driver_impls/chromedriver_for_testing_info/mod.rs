@@ -8,12 +8,14 @@ use crate::prelude::VersionReqUrlInfo;
 mod trait_impls;
 
 /// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chrome for Testing.
+#[derive(Debug)]
 pub struct ChromedriverForTestingInfo {
     pub driver_install_path: PathBuf,
     pub browser_path: PathBuf,
 }
 
 impl ChromedriverForTestingInfo {
+    #[tracing::instrument]
     pub fn new(driver_install_path: PathBuf, browser_path: PathBuf) -> Self {
         ChromedriverForTestingInfo {
             driver_install_path,

@@ -26,12 +26,14 @@ pub enum OfflineVerificationError {
 
 /// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chromedriver.
 /// This works on both old and new Chromedriver.
+#[derive(Debug)]
 pub enum ChromedriverInfo {
     OldInfo(ChromedriverOldInfo),
     NewInfo(ChromedriverForTestingInfo),
 }
 
 impl ChromedriverInfo {
+    #[tracing::instrument]
     pub fn is_chrome_for_testing(path: &Path) -> Result<bool, VersionReqError> {
         const CHROME_FOR_TESTING_FIRST_MAJOR_VERSION: u64 = 116;
 
@@ -39,6 +41,7 @@ impl ChromedriverInfo {
             .map(|version| version.major >= CHROME_FOR_TESTING_FIRST_MAJOR_VERSION)
     }
 
+    #[tracing::instrument]
     pub fn new(driver_install_path: PathBuf, browser_path: PathBuf) -> Self {
         if Self::is_chrome_for_testing(&browser_path).unwrap_or(false) {
             ChromedriverInfo::NewInfo(ChromedriverForTestingInfo::new(

@@ -100,11 +100,13 @@ impl WebdriverVerificationInfo for GeckodriverInfo {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Result;
+
     use crate::prelude::GeckodriverInfo;
     use crate::prelude::*;
 
     #[test]
-    fn test_get_binary_version() {
+    fn test_get_binary_version() -> Result<()> {
         let browser_path = os_specific::geckodriver::default_browser_path()
             .expect("Failed to get default browser path");
 
@@ -113,6 +115,8 @@ mod tests {
             browser_path,
         };
 
-        assert!(geckodriver_info.binary_version().is_ok());
+        geckodriver_info.binary_version()?;
+
+        Ok(())
     }
 }

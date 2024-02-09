@@ -6,12 +6,14 @@ use crate::os_specific::DefaultPathError;
 mod trait_impls;
 
 /// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Geckodriver.
+#[derive(Debug)]
 pub struct GeckodriverInfo {
     pub driver_install_path: PathBuf,
     pub browser_path: PathBuf,
 }
 
 impl GeckodriverInfo {
+    #[tracing::instrument]
     pub fn new(driver_install_path: PathBuf, browser_path: PathBuf) -> Self {
         GeckodriverInfo {
             driver_install_path,

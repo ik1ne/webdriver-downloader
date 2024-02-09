@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/cache@v3
+    - uses: actions/checkout@v4
+    - uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -23,17 +24,17 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
 
   windows:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/cache@v3
+    - uses: actions/checkout@v4
+    - uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -42,17 +43,17 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: SET "RUST_LOG=webdriver_downloader=trace" & cargo test --verbose
 
   macos:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/cache@v3
+    - uses: actions/checkout@v4
+    - uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -61,8 +62,7 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: cargo test --verbose
+      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose

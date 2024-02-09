@@ -23,6 +23,7 @@ pub fn build_url(version_string: &str) -> String {
     )
 }
 
+#[tracing::instrument]
 pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let mut child = std::process::Command::new("powershell");
 

@@ -8,6 +8,7 @@ use crate::traits::version_req_url_info::VersionReqUrlInfo;
 mod trait_impls;
 
 /// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for old Chromedriver.
+#[derive(Debug)]
 pub struct ChromedriverOldInfo {
     pub driver_install_path: PathBuf,
     pub browser_path: PathBuf,

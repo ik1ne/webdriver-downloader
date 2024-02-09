@@ -5,6 +5,7 @@ use semver::Version;
 
 use crate::traits::version_req_url_info::VersionReqError;
 
+#[tracing::instrument]
 pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let re = Regex::new(r"([0-9\.]+)").expect("Failed to parse regex.");
     let output = std::process::Command::new(browser_path)

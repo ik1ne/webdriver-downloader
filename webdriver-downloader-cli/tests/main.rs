@@ -4,9 +4,8 @@ use std::path::PathBuf;
 use assert_cmd::Command;
 use assert_fs::prelude::*;
 use assert_fs::TempDir;
-use predicates::ord::eq;
 use predicates::prelude::*;
-use predicates::str::ends_with;
+use predicates::str::{contains, ends_with};
 
 use webdriver_downloader::prelude::*;
 
@@ -100,7 +99,9 @@ async fn test_existing_driver() {
         .args([OsStr::new("--driver"), driver_path.as_os_str()].iter())
         .assert();
 
-    assert.success().stdout(eq("Driver already installed.\n"));
+    assert
+        .success()
+        .stdout(contains("Driver already installed.\n"));
 
     temp_dir
         .child(CHROMEDRIVER_BIN)

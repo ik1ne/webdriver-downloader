@@ -7,6 +7,7 @@ use crate::traits::version_req_url_info::VersionReqError;
 
 pub const DRIVER_EXECUTABLE_NAME: &str = "chromedriver.exe";
 
+#[tracing::instrument]
 pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let mut child = std::process::Command::new("powershell");
 

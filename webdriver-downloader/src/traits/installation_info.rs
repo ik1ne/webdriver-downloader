@@ -1,4 +1,5 @@
 use std::ffi::OsStr;
+use std::fmt::Debug;
 use std::fs;
 use std::fs::File;
 use std::io::{self, Cursor};
@@ -40,7 +41,8 @@ pub trait WebdriverInstallationInfo {
     fn driver_executable_name(&self) -> &str;
 
     /// Downloads url and extracts the driver executable to tempdir.
-    async fn download_in_tempdir<U: IntoUrl + AsRef<str> + Send>(
+    #[tracing::instrument(skip(self))]
+    async fn download_in_tempdir<U: IntoUrl + AsRef<str> + Debug + Send>(
         &self,
         url: U,
         dir: &TempDir,
@@ -70,7 +72,8 @@ pub trait WebdriverInstallationInfo {
     }
 
     /// installs driver from `temp_dir_path` to [`self.driver_install_path()`](Self::driver_install_path).
-    fn install_driver<P: AsRef<Path>>(
+    #[tracing::instrument(skip(self))]
+    fn install_driver<P: AsRef<Path> + Debug>(
         &self,
         temp_driver_path: &P,
     ) -> Result<(), InstallationError> {
@@ -93,6 +96,7 @@ enum ArchiveType {
     TarGz,
 }
 
+#[tracing::instrument]
 fn detect_archive_type(url: &str) -> Option<ArchiveType> {
     if url.ends_with(".tar.gz") {
         Some(ArchiveType::TarGz)
@@ -103,6 +107,7 @@ fn detect_archive_type(url: &str) -> Option<ArchiveType> {
     }
 }
 
+#[tracing::instrument(skip(content))]
 fn extract_zip(
     content: Cursor<Bytes>,
     driver_executable_name: &str,
@@ -129,6 +134,7 @@ fn extract_zip(
     io::copy(&mut driver_content, &mut driver_file).map_err(InstallationError::Write)
 }
 
+#[tracing::instrument(skip(content))]
 fn extract_tarball(
     content: Cursor<Bytes>,
     driver_executable_name: &str,
@@ -161,6 +167,7 @@ pub enum AddExecutePermissionError {
 }
 
 #[cfg(unix)]
+#[tracing::instrument]
 pub(crate) fn add_execute_permission(path: &Path) -> Result<(), AddExecutePermissionError> {
     use std::os::unix::fs::PermissionsExt;
 
