@@ -4,7 +4,6 @@ use std::path::PathBuf;
 use assert_cmd::Command;
 use assert_fs::prelude::*;
 use assert_fs::TempDir;
-use predicates::ord::eq;
 use predicates::prelude::*;
 use predicates::str::{contains, ends_with};
 
