@@ -47,20 +47,9 @@ impl WebdriverInstallationInfo for ChromedriverInfo {
 
 impl WebdriverVerificationInfo for ChromedriverInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
-        let browser_path = match self {
-            ChromedriverInfo::OldInfo(old_info) => &old_info.browser_path,
-            ChromedriverInfo::NewInfo(new_info) => &new_info.browser_path,
-        };
-
-        let capabilities_value = json!({
-            "binary": browser_path,
-            "args": ["-headless"],
-        });
-
-        let mut capabilities = Map::new();
-
-        capabilities.insert("goog:chromeOptions".to_string(), capabilities_value);
-
-        Some(capabilities)
+        match self {
+            ChromedriverInfo::OldInfo(old_info) => old_info.driver_capabilities(),
+            ChromedriverInfo::NewInfo(new_info) => new_info.driver_capabilities(),
+        }
     }
 }
