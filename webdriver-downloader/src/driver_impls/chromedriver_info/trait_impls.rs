@@ -3,7 +3,6 @@ use std::path::Path;
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use semver::Version;
-use serde_json::{json, Map};
 
 use crate::os_specific;
 use crate::traits::installation_info::WebdriverInstallationInfo;
