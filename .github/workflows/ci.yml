@@ -46,7 +46,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
+      run: SET "RUST_LOG=webdriver_downloader=trace" & cargo test --verbose
 
   macos:
     runs-on: macos-latest
