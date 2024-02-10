@@ -51,8 +51,8 @@ jobs:
       run: apt install -y chromium
     - name: install firefox
       run: apt-get install -y firefox-esr
-    - name: check path of firefox
-      run: which firefox
+    - name: check version of firefox
+      run: /usr/bin/firefox --version
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
