@@ -14,85 +14,75 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Build
-      run: cargo build --verbose --tests
-    - name: Run tests
-      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: cargo build --verbose --tests
+      - name: Run tests
+        run: RUST_LOG=webdriver_downloader=trace RUST_LOG_SPAN_EVENTS=new cargo test --verbose
 
-  ubuntu_root:
+  ubuntu-sudo:
     runs-on: ubuntu-latest
-    container:
-      image: rust:latest
-      options: --user root
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: apt-get update
-      run: apt-get update
-    - name: install chromium
-      run: apt install -y chromium
-    - name: install firefox
-      run: apt-get install -y firefox-esr
-    - name: check version of firefox
-      run: /usr/bin/firefox --version
-    - name: Build
-      run: cargo build --verbose --tests
-    - name: Run tests
-      run: RUST_LOG=webdriver_downloader=trace RUST_LOG_SPAN_EVENTS=new cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: sudo -i cargo build --verbose --tests
+      - name: Run tests
+        run: RUST_LOG=webdriver_downloader=trace RUST_LOG_SPAN_EVENTS=new sudo -i cargo test --verbose
+
 
   windows:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Build
-      run: cargo build --verbose --tests
-    - name: Run tests
-      run: SET "RUST_LOG=webdriver_downloader=trace" & cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: cargo build --verbose --tests
+      - name: Run tests
+        run: SET "RUST_LOG=webdriver_downloader=trace" && SET "RUST_LOG_SPAN_EVENTS=new" && cargo test --verbose
 
   macos:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Build
-      run: cargo build --verbose --tests
-    - name: Run tests
-      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: cargo build --verbose --tests
+      - name: Run tests
+        run: RUST_LOG=webdriver_downloader=trace RUST_LOG_SPAN_EVENTS=new cargo test --verbose
