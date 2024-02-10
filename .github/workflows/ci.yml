@@ -56,7 +56,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --tests
     - name: Run tests
-      run: RUST_LOG=webdriver_downloader=trace cargo test --verbose
+      run: RUST_LOG=webdriver_downloader=trace RUST_LOG_SPAN_EVENTS=new cargo test --verbose
 
   windows:
     runs-on: windows-latest
