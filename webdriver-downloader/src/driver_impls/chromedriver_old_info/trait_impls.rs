@@ -89,6 +89,7 @@ impl WebdriverVerificationInfo for ChromedriverOldInfo {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
+    use test_log::test;
 
     use crate::prelude::*;
 

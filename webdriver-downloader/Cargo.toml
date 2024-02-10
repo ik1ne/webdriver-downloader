@@ -37,6 +37,7 @@ zip = "0.6"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+test-log = { version = "0.2", features = ["trace"] }
 
 [features]
 default = ["native-tls"]
