@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: rust:latest
+      options: --user root
 
     steps:
     - uses: actions/checkout@v4
