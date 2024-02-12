@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::process::Stdio;
 
 use regex::Regex;
 use semver::Version;
@@ -11,6 +12,7 @@ pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let re = Regex::new(r"([0-9\.]+)").expect("Failed to parse regex.");
     let output = std::process::Command::new(browser_path)
         .arg(Path::new("--version"))
+        .stderr(Stdio::piped())
         .output()?;
 
     let gecko_version_string = String::from_utf8_lossy(&output.stdout);
