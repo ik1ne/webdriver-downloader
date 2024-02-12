@@ -46,18 +46,16 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Print .cargo location
-        run: echo $HOME/.cargo
       - name: Print chromium version
-        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && chromium --version'
+        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && chromium --version'
       - name: Print firefox version
-        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && firefox --version'
+        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && firefox --version'
       - name: Set stable rust
-        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && rustup default stable'
+        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && ~runner/.cargo/rustup default stable'
       - name: Build
-        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && cargo build --verbose --tests'
+        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && ~runner/.cargo/cargo build --verbose --tests'
       - name: Run tests
-        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && cargo test --verbose'
+        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && ~runner/.cargo/cargo test --verbose'
 
 
   windows:
