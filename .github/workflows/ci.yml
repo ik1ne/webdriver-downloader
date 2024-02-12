@@ -47,15 +47,15 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Print chromium version
-        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && chromium --version'
+        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && chromium --version'
       - name: Print firefox version
-        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && firefox --version'
+        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && firefox --version'
       - name: Set stable rust
-        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && ~runner/.cargo/rustup default stable'
+        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && rustup default stable'
       - name: Build
-        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && ~runner/.cargo/cargo build --verbose --tests'
+        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && cargo build --verbose --tests'
       - name: Run tests
-        run: sudo -i bash -c 'cd $GITHUB_WORKSPACE && ~runner/.cargo/cargo test --verbose'
+        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && cargo test --verbose'
 
 
   windows:
