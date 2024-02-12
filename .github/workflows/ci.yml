@@ -31,6 +31,9 @@ jobs:
 
   ubuntu-sudo:
     runs-on: ubuntu-latest
+    env:
+      RUST_LOG: webdriver_downloader=trace
+      RUST_LOG_SPAN_EVENTS: new
 
     steps:
       - uses: actions/checkout@v4
@@ -43,12 +46,18 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Print .cargo location
+        run: echo $HOME/.cargo
+      - name: Print chromium version
+        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && chromium --version'
+      - name: Print firefox version
+        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && firefox --version'
       - name: Set stable rust
-        run: sudo -s rustup default stable
+        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && rustup default stable'
       - name: Build
-        run: sudo -s cargo build --verbose --tests
+        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && cargo build --verbose --tests'
       - name: Run tests
-        run: RUST_LOG=webdriver_downloader=trace RUST_LOG_SPAN_EVENTS=new sudo -s cargo test --verbose
+        run: sudo -E bash -c 'cd $GITHUB_WORKSPACE && cargo test --verbose'
 
 
   windows:
