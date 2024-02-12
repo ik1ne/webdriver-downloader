@@ -2,8 +2,6 @@ use std::path::Path;
 
 use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
-#[cfg(target_family = "unix")]
-use nix::unistd::Uid;
 use regex::Regex;
 use semver::{Version, VersionReq};
 use serde_json::{json, Map};
@@ -65,17 +63,9 @@ impl WebdriverInstallationInfo for ChromedriverOldInfo {
 
 impl WebdriverVerificationInfo for ChromedriverOldInfo {
     fn driver_capabilities(&self) -> Option<Capabilities> {
-        #[cfg(target_family = "unix")]
-        let args = match Uid::effective().is_root() {
-            true => vec!["--no-sandbox", "-headless"],
-            false => vec!["-headless"],
-        };
-        #[cfg(not(target_family = "unix"))]
-        let args = vec!["-headless"];
-
         let capabilities_value = json!({
             "binary": self.browser_path,
-            "args": args,
+            "args": ["-headless"],
         });
 
         let mut capabilities = Map::new();
@@ -89,7 +79,6 @@ impl WebdriverVerificationInfo for ChromedriverOldInfo {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use test_log::test;
 
     use crate::prelude::*;
 
