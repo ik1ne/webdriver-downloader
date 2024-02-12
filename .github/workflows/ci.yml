@@ -46,10 +46,6 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Print GITHUB_WORKSPACE
-        run: echo $GITHUB_WORKSPACE
-      - name: Print GITHUB_WORKSPACE as root
-        run: sudo -i --preserve-env=PATH bash -c 'echo $GITHUB_WORKSPACE'
       - name: Print chromium version
         run: sudo -i --preserve-env=PATH bash -c 'cd ${{ github.workspace }} && chromium --version'
       - name: Print firefox version
