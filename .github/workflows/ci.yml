@@ -46,16 +46,20 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Print GITHUB_WORKSPACE
+        run: echo $GITHUB_WORKSPACE
+      - name: Print GITHUB_WORKSPACE as root
+        run: sudo -i --preserve-env=PATH bash -c 'echo $GITHUB_WORKSPACE'
       - name: Print chromium version
-        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && chromium --version'
+        run: sudo -i --preserve-env=PATH bash -c 'cd ${{ github.workspace }} && chromium --version'
       - name: Print firefox version
-        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && firefox --version'
+        run: sudo -i --preserve-env=PATH bash -c 'cd ${{ github.workspace }} && firefox --version'
       - name: Set stable rust
-        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && rustup default stable'
+        run: sudo -i --preserve-env=PATH bash -c 'cd ${{ github.workspace }} && rustup default stable'
       - name: Build
-        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && cargo build --verbose --tests'
+        run: sudo -i --preserve-env=PATH bash -c 'cd ${{ github.workspace }} && cargo build --verbose --tests'
       - name: Run tests
-        run: sudo -i --preserve-env=PATH bash -c 'cd $GITHUB_WORKSPACE && cargo test --verbose'
+        run: sudo -i --preserve-env=PATH bash -c 'cd ${{ github.workspace }} && cargo test --verbose'
 
 
   windows:
