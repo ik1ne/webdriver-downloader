@@ -101,6 +101,7 @@ impl WebdriverVerificationInfo for GeckodriverInfo {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
+    use test_log::test;
 
     use crate::prelude::GeckodriverInfo;
     use crate::prelude::*;
