@@ -72,6 +72,22 @@ impl ChromedriverInfo {
         ))
     }
 
+    /// Set the path to install the driver to.
+    pub fn set_install_path(&mut self, path: PathBuf) {
+        match self {
+            ChromedriverInfo::OldInfo(old_info) => old_info.driver_install_path = path,
+            ChromedriverInfo::NewInfo(new_info) => new_info.driver_install_path = path,
+        }
+    }
+
+    /// Set the path to the browser binary.
+    pub fn set_browser_path(&mut self, path: PathBuf) {
+        match self {
+            ChromedriverInfo::OldInfo(old_info) => old_info.browser_path = path,
+            ChromedriverInfo::NewInfo(new_info) => new_info.browser_path = path,
+        }
+    }
+
     /// Verify that the driver and browser versions match, without making any network requests.
     pub fn verify_driver_offline(&self) -> Result<(), OfflineVerificationError> {
         let driver_install_path = match self {

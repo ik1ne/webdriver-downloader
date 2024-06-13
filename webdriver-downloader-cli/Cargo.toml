@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader-cli"
-version = "0.5.16"
+version = "0.5.17"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Cli for webdriver download."
@@ -21,7 +21,7 @@ clap = { version = "4", features = ["cargo", "string"] }
 tokio = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-webdriver-downloader = { version = "0.14", path = "../webdriver-downloader", default-features = false }
+webdriver-downloader = { version = "0.15", path = "../webdriver-downloader", default-features = false }
 
 [dev-dependencies]
 assert_cmd = "2"
