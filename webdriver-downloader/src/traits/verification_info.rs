@@ -50,7 +50,7 @@ pub trait WebdriverVerificationInfo {
         #[cfg(feature = "native-tls")]
         let mut new_client = fantoccini::ClientBuilder::native();
         #[cfg(feature = "rustls-tls")]
-        let mut new_client = fantoccini::ClientBuilder::rustls();
+        let mut new_client = fantoccini::ClientBuilder::rustls()?;
         let client = loop {
             let connect_result = if let Some(capabilities) = self.driver_capabilities() {
                 new_client
