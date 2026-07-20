@@ -61,7 +61,8 @@ pub mod traits;
 /// necessary imports for using library provided driver implementations.
 pub mod prelude {
     pub use crate::driver_impls::{
-        chromedriver_info::ChromedriverInfo, geckodriver_info::GeckodriverInfo,
+        chromedriver_info::ChromedriverInfo, edgedriver_info::EdgedriverInfo,
+        geckodriver_info::GeckodriverInfo,
     };
     pub use crate::os_specific;
     pub use crate::traits::installation_info::{

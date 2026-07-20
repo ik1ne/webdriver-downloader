@@ -26,8 +26,13 @@ pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
 }
 
 pub fn build_url(version_string: &str) -> String {
+    // ChromeDriver old only supports x64 architecture
+    // ARM64 users should use Chrome for Testing (newer ChromeDriver)
     format!(
         "https://chromedriver.storage.googleapis.com/{}/chromedriver_linux64.zip",
         version_string
     )
 }
+
+// Note: ChromeDriver old only supports x64 architecture on Linux
+// ARM64 users will get a 404 error when trying to download

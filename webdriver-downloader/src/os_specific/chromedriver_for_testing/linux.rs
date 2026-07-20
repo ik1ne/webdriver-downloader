@@ -4,7 +4,13 @@ use which::{which, Error};
 
 use crate::os_specific::DefaultPathError;
 
+#[cfg(target_arch = "x86_64")]
 pub const PLATFORM: &str = "linux64";
+
+// Chrome for Testing does not support ARM64 on Linux yet
+// ARM64 users should use EdgeDriver instead
+#[cfg(target_arch = "aarch64")]
+pub const PLATFORM: &str = "linux64"; // Will result in 404, but allows compilation
 
 pub const DRIVER_EXECUTABLE_NAME: &str = "chromedriver";
 

@@ -1,4 +1,5 @@
 use webdriver_downloader::driver_impls::chromedriver_info::ChromedriverInfo;
+use webdriver_downloader::driver_impls::edgedriver_info::EdgedriverInfo;
 
 use super::build_arg::*;
 use super::check_arg::*;
@@ -14,6 +15,17 @@ pub async fn run() -> anyhow::Result<String> {
     let install_result = match args.driver_type {
         DriverType::Chrome => {
             let driver_info = ChromedriverInfo::new(args.driver_install_path, args.browser_path);
+
+            install(
+                &driver_info,
+                args.reinstall,
+                args.skip_verification,
+                args.num_tries,
+            )
+            .await
+        }
+        DriverType::Edge => {
+            let driver_info = EdgedriverInfo::new(args.driver_install_path, args.browser_path);
 
             install(
                 &driver_info,

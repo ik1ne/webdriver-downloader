@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader"
-version = "0.16.0"
+version = "0.16.4"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Library for webdriver download."
@@ -8,7 +8,7 @@ repository = "https://github.com/ik1ne/webdriver-downloader"
 homepage = "https://github.com/ik1ne/webdriver-downloader"
 license = "MIT"
 readme = "README.md"
-keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver"]
+keywords = ["webdriver-downloader", "webdriver", "chromedriver", "geckodriver", "edgedriver"]
 categories = ["web-programming"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -21,6 +21,7 @@ pub(crate) struct Args {
 #[derive(Debug, Copy, Clone)]
 pub(crate) enum DriverType {
     Chrome,
+    Edge,
     Gecko,
 }
 
@@ -28,6 +29,7 @@ impl DriverType {
     fn default_driver_install_path(&self) -> Result<PathBuf, os_specific::DefaultPathError> {
         match self {
             DriverType::Chrome => os_specific::chromedriver::default_driver_path(),
+            DriverType::Edge => os_specific::edgedriver::default_driver_path(),
             DriverType::Gecko => os_specific::geckodriver::default_driver_path(),
         }
     }
@@ -43,6 +45,7 @@ impl DriverType {
                     os_specific::chromedriver_old::default_browser_path()
                 }
             }
+            DriverType::Edge => os_specific::edgedriver::default_browser_path(),
             DriverType::Gecko => os_specific::geckodriver::default_browser_path(),
         }
     }

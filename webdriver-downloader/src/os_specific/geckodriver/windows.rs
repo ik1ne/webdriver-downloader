@@ -16,6 +16,15 @@ pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
     )))
 }
 
+#[cfg(target_arch = "aarch64")]
+pub fn build_url(version_string: &str) -> String {
+    format!(
+        "https://github.com/mozilla/geckodriver/releases/download/v{ver}/geckodriver-v{ver}-win-aarch64.zip",
+        ver=version_string
+    )
+}
+
+#[cfg(target_arch = "x86_64")]
 pub fn build_url(version_string: &str) -> String {
     format!(
         "https://github.com/mozilla/geckodriver/releases/download/v{ver}/geckodriver-v{ver}-win64.zip",

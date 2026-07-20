@@ -4,4 +4,5 @@
 pub mod chromedriver_for_testing_info;
 pub mod chromedriver_info;
 pub mod chromedriver_old_info;
+pub mod edgedriver_info;
 pub mod geckodriver_info;

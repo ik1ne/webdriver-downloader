@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use clap::{arg, command, value_parser, ArgMatches, Arg, ArgAction};
+use clap::{arg, command, value_parser, Arg, ArgAction, ArgMatches};
 
 use super::{Args, DriverType};
 
@@ -10,7 +10,7 @@ pub(super) fn get_args() -> Result<Args> {
         .arg(
             arg!(--type <TYPE> "driver type")
                 .default_value("chrome")
-                .value_parser(["chrome", "gecko"]),
+                .value_parser(["chrome", "edge", "gecko"]),
         )
         .arg(
             arg!(--driver <PATH> "driver path")
@@ -69,6 +69,7 @@ fn get_driver_type(matches: &ArgMatches) -> DriverType {
 
     match browser_type.as_str() {
         "chrome" => DriverType::Chrome,
+        "edge" => DriverType::Edge,
         "gecko" => DriverType::Gecko,
         _ => panic!("Unexpected argument value of \"type\". {:?}", browser_type),
     }
