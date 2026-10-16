@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::fs;
@@ -115,7 +116,13 @@ fn extract_zip(
 ) -> Result<u64, InstallationError> {
     let mut archive = ZipArchive::new(content)?;
 
-    let file_names = archive.file_names().map(str::to_string).collect::<Vec<_>>();
+    // zip 9 decodes names lazily; an undecodable entry can't be the driver, so skip it
+    // rather than abort, matching zip 8 where listing names could not fail.
+    let file_names = archive
+        .file_names()
+        .filter_map(Result::ok)
+        .map(Cow::into_owned)
+        .collect::<Vec<_>>();
 
     // file_names are actually file_paths
     for file_name in file_names {
@@ -180,4 +187,41 @@ pub(crate) fn add_execute_permission(path: &Path) -> Result<(), AddExecutePermis
     fs::set_permissions(path, permissions).map_err(AddExecutePermissionError::SetPermissions)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::Write;
+
+    use zip::write::SimpleFileOptions;
+    use zip::ZipWriter;
+
+    use super::*;
+
+    #[test]
+    fn extract_zip_finds_driver_in_subdirectory() {
+        let mut writer = ZipWriter::new(Cursor::new(Vec::new()));
+        let options = SimpleFileOptions::default();
+        writer
+            .start_file("chromedriver-mac-arm64/LICENSE.chromedriver", options)
+            .unwrap();
+        writer.write_all(b"license").unwrap();
+        writer
+            .start_file("chromedriver-mac-arm64/chromedriver", options)
+            .unwrap();
+        writer.write_all(b"driver-bytes").unwrap();
+        let archive = writer.finish().unwrap().into_inner();
+
+        let dir = TempDir::new().unwrap();
+        let driver_path = dir.path().join("chromedriver");
+        let written = extract_zip(
+            Cursor::new(Bytes::from(archive)),
+            "chromedriver",
+            &driver_path,
+        )
+        .unwrap();
+
+        assert_eq!(written, 12);
+        assert_eq!(fs::read(&driver_path).unwrap(), b"driver-bytes");
+    }
 }
