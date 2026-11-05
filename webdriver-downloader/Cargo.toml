@@ -1,6 +1,6 @@
 [package]
 name = "webdriver-downloader"
-version = "0.17.0"
+version = "0.18.0"
 edition = "2021"
 authors = ["ik1ne <ik1ne@naver.com>"]
 description = "Library for webdriver download."
@@ -33,7 +33,7 @@ thiserror = "2"
 tokio = { version = "1", features = ["process", "time"] }
 tracing = "0.1"
 which = "8"
-zip = "8"
+zip = "9.3"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
