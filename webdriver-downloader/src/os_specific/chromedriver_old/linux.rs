@@ -17,7 +17,7 @@ pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
             }
             Err(e) => match e {
                 Error::CannotFindBinaryPath => continue,
-                _ => return Err(DefaultPathError::Which(e)),
+                _ => return Err(DefaultPathError::Which(e.into())),
             },
         }
     }

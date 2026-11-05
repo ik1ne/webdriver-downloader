@@ -10,10 +10,10 @@ use serde::Deserialize;
 use serde_json::{json, Map};
 
 use crate::os_specific;
-use crate::prelude::{
-    UrlError, VersionReqError, VersionReqUrlInfo, WebdriverInstallationInfo,
-    WebdriverVerificationInfo, WebdriverVersionUrl,
-};
+use crate::traits::installation_info::WebdriverInstallationInfo;
+use crate::traits::url_info::{fetch_text, UrlError, WebdriverVersionUrl};
+use crate::traits::verification_info::WebdriverVerificationInfo;
+use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
 use super::ChromedriverForTestingInfo;
 
@@ -46,12 +46,10 @@ impl VersionReqUrlInfo for ChromedriverForTestingInfo {
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
-        let response = reqwest::get("https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json")
-        .await?
-        .text()
-        .await?;
+        let response = fetch_text("https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json").await?;
 
-        let deserialized: JsonRoot = serde_json::from_str(&response)?;
+        let deserialized: JsonRoot =
+            serde_json::from_str(&response).map_err(|e| UrlError::JsonParse(e.into()))?;
 
         let versions = deserialized.versions;
 
@@ -70,9 +68,9 @@ fn version_into_webdriver_version_url(
 ) -> Result<Option<WebdriverVersionUrl>, UrlError> {
     let version_str = version.version;
     let webdriver_version = lenient_semver::parse(&version_str)
-        .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+        .map_err(|e| VersionReqError::ParseVersion(e.owned().into()))?;
     let version_req = VersionReq::parse(&format!("^{}", webdriver_version))
-        .map_err(VersionReqError::ParseVersionReq)?;
+        .map_err(|e| VersionReqError::ParseVersionReq(e.into()))?;
     let Some(downloads) = version.downloads.remove("chromedriver") else {
         return Ok(None);
     };
@@ -132,7 +130,8 @@ mod tests {
     use anyhow::Result;
     use test_log::test;
 
-    use crate::prelude::*;
+    use crate::os_specific;
+    use crate::traits::version_req_url_info::VersionReqUrlInfo;
 
     use super::ChromedriverForTestingInfo;
 

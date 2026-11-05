@@ -1,12 +1,12 @@
-use which::which;
 use std::path::PathBuf;
+use which::which;
 
 use crate::os_specific::DefaultPathError;
 
 pub const DRIVER_EXECUTABLE_NAME: &str = "geckodriver";
 
 pub fn default_browser_path() -> Result<PathBuf, DefaultPathError> {
-    which("firefox").map_err(|e| e.into())
+    which("firefox").map_err(|e| DefaultPathError::Which(e.into()))
 }
 
 pub fn build_url(version_string: &str) -> String {

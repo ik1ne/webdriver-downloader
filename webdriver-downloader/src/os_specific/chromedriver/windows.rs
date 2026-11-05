@@ -8,7 +8,7 @@ use crate::traits::version_req_url_info::VersionReqError;
 pub const DRIVER_EXECUTABLE_NAME: &str = "chromedriver.exe";
 
 #[tracing::instrument]
-pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
+pub(crate) fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let mut child = std::process::Command::new("powershell");
 
     let mut command = OsString::from("(Get-Item \"");
@@ -18,5 +18,6 @@ pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     child.arg("-command").arg(command);
 
     let output = child.output()?;
-    lenient_semver::parse(&String::from_utf8_lossy(&output.stdout)).map_err(|e| e.owned().into())
+    lenient_semver::parse(&String::from_utf8_lossy(&output.stdout))
+        .map_err(|e| VersionReqError::ParseVersion(e.owned().into()))
 }

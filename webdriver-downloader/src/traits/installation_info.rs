@@ -13,28 +13,29 @@ use tar::Archive;
 use tempfile::TempDir;
 use zip::ZipArchive;
 
+use crate::traits::BoxError;
+
 /// Error that can occur during installation.
 #[derive(thiserror::Error, Debug)]
+#[non_exhaustive]
 pub enum InstallationError {
     #[error("Failed to download driver: {0}")]
-    Download(#[from] reqwest::Error),
+    Download(#[source] BoxError),
     #[error("Unknown archive format.")]
     UnknownArchiveFormat,
     #[error("Failed to extract driver zipfile: {0}")]
-    ExtractZip(#[from] zip::result::ZipError),
+    ExtractZip(#[source] BoxError),
     #[error("Failed to extract driver tarball: {0}")]
     ExtractTar(io::Error),
     #[error("Failed to write driver to disk: {0}")]
     Write(io::Error),
     #[error(transparent)]
     AddExecutePermission(#[from] AddExecutePermissionError),
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
 }
 
 /// Provides information for installing driver.
 #[async_trait]
-pub trait WebdriverInstallationInfo {
+pub(crate) trait WebdriverInstallationInfo {
     /// Path to install driver to.
     fn driver_install_path(&self) -> &Path;
 
@@ -51,8 +52,10 @@ pub trait WebdriverInstallationInfo {
         let archive_type =
             detect_archive_type(url.as_ref()).ok_or(InstallationError::UnknownArchiveFormat)?;
 
-        let response = reqwest::get(url).await?;
-        let content = Cursor::new(response.bytes().await?);
+        let download = |e: reqwest::Error| InstallationError::Download(e.into());
+
+        let response = reqwest::get(url).await.map_err(download)?;
+        let content = Cursor::new(response.bytes().await.map_err(download)?);
 
         let driver_executable_name = self.driver_executable_name();
         let driver_path = dir.path().join(driver_executable_name);
@@ -114,7 +117,9 @@ fn extract_zip(
     driver_executable_name: &str,
     driver_path: &Path,
 ) -> Result<u64, InstallationError> {
-    let mut archive = ZipArchive::new(content)?;
+    let extract = |e: zip::result::ZipError| InstallationError::ExtractZip(e.into());
+
+    let mut archive = ZipArchive::new(content).map_err(extract)?;
 
     // zip 9 decodes names lazily; an undecodable entry can't be the driver, so skip it
     // rather than abort, matching zip 8 where listing names could not fail.
@@ -130,12 +135,12 @@ fn extract_zip(
         let real_file_name = file_path.file_name();
         if real_file_name == Some(OsStr::new(driver_executable_name)) {
             let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
-            let mut driver_content = archive.by_name(&file_name)?;
+            let mut driver_content = archive.by_name(&file_name).map_err(extract)?;
             return io::copy(&mut driver_content, &mut driver_file)
                 .map_err(InstallationError::Write);
         }
     }
-    let mut driver_content = archive.by_name(driver_executable_name)?;
+    let mut driver_content = archive.by_name(driver_executable_name).map_err(extract)?;
 
     let mut driver_file = File::create(driver_path).map_err(InstallationError::Write)?;
     io::copy(&mut driver_content, &mut driver_file).map_err(InstallationError::Write)
@@ -166,6 +171,7 @@ fn extract_tarball(
 
 /// Error that can occur during adding execute permission.
 #[derive(thiserror::Error, Debug)]
+#[non_exhaustive]
 pub enum AddExecutePermissionError {
     #[error("Failed to get file metadata: {0}")]
     Metadata(io::Error),
@@ -223,5 +229,28 @@ mod tests {
 
         assert_eq!(written, 12);
         assert_eq!(fs::read(&driver_path).unwrap(), b"driver-bytes");
+    }
+
+    #[test]
+    fn extract_zip_error_keeps_message_and_source() {
+        use std::error::Error;
+
+        let dir = TempDir::new().unwrap();
+        let error = extract_zip(
+            Cursor::new(Bytes::from_static(b"not a zip archive")),
+            "chromedriver",
+            &dir.path().join("chromedriver"),
+        )
+        .unwrap_err();
+
+        assert!(matches!(error, InstallationError::ExtractZip(_)));
+        assert!(error
+            .to_string()
+            .starts_with("Failed to extract driver zipfile: "));
+        assert!(error
+            .source()
+            .unwrap()
+            .downcast_ref::<zip::result::ZipError>()
+            .is_some());
     }
 }

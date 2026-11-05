@@ -5,28 +5,28 @@ use async_trait::async_trait;
 use semver::Version;
 
 use crate::traits::url_info::WebdriverVersionUrl;
+use crate::traits::BoxError;
 
 use super::url_info::{UrlError, WebdriverUrlInfo};
 
-/// Errors that can occur when implementing [`VersionReqUrlInfo`].
+/// Errors that can occur while determining a driver or browser version.
 #[derive(thiserror::Error, Debug)]
+#[non_exhaustive]
 pub enum VersionReqError {
     #[error("Failed to capture regex from string: {0}")]
     RegexError(String),
     #[error(transparent)]
-    ParseVersion(#[from] lenient_semver::parser::OwnedError),
+    ParseVersion(BoxError),
     #[error("Failed to execute binary: {0}")]
     Execute(#[from] std::io::Error),
     #[error(transparent)]
-    ParseVersionReq(#[from] semver::Error),
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
+    ParseVersionReq(BoxError),
 }
 
 /// Provides information for determining which url to download.
 /// This trait sort the urls based on the version of the driver.
 #[async_trait]
-pub trait VersionReqUrlInfo: WebdriverUrlInfo {
+pub(crate) trait VersionReqUrlInfo: WebdriverUrlInfo {
     /// Version hint. Used by [`VersionReqUrlInfo::compare_driver`].
     fn binary_version(&self) -> Result<Version, VersionReqError>;
 
@@ -111,7 +111,8 @@ mod tests {
     use async_trait::async_trait;
     use semver::{Version, VersionReq};
 
-    use crate::prelude::*;
+    use crate::traits::url_info::{UrlError, WebdriverUrlInfo, WebdriverVersionUrl};
+    use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
     struct MockBinaryMajorVersionHintUrlInfo {
         version_hint: Option<Version>,
@@ -123,7 +124,7 @@ mod tests {
         fn binary_version(&self) -> Result<Version, VersionReqError> {
             self.version_hint
                 .clone()
-                .ok_or(VersionReqError::Other(anyhow::anyhow!("No version hint")))
+                .ok_or(VersionReqError::RegexError("No version hint".to_string()))
         }
 
         async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {

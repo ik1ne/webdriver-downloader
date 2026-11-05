@@ -8,7 +8,7 @@ use tracing::trace;
 use crate::traits::version_req_url_info::VersionReqError;
 
 #[tracing::instrument]
-pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
+pub(crate) fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
     let re = Regex::new(r"([0-9\.]+)").expect("Failed to parse regex.");
     let output = std::process::Command::new(browser_path)
         .arg(Path::new("--version"))
@@ -21,7 +21,8 @@ pub fn binary_version(browser_path: &Path) -> Result<Version, VersionReqError> {
         VersionReqError::RegexError(gecko_version_string.to_string()),
     )?;
 
-    lenient_semver::parse(&version_string).map_err(|e| e.owned().into())
+    lenient_semver::parse(&version_string)
+        .map_err(|e| VersionReqError::ParseVersion(e.owned().into()))
 }
 
 fn capture_regex_from_string(regex: &Regex, string: &str) -> Option<String> {

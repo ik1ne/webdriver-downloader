@@ -7,7 +7,7 @@ use crate::traits::version_req_url_info::VersionReqUrlInfo;
 
 mod trait_impls;
 
-/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for old Chromedriver.
+/// [`WebdriverDownloadInfo`](crate::prelude::WebdriverDownloadInfo) implementation for old Chromedriver.
 #[derive(Debug)]
 pub struct ChromedriverOldInfo {
     pub driver_install_path: PathBuf,
@@ -43,8 +43,8 @@ impl ChromedriverOldInfo {
 
         if driver_version.major != binary_version.major {
             Err(OfflineVerificationError::VersionMismatch {
-                driver: driver_version,
-                browser: binary_version,
+                driver: driver_version.to_string(),
+                browser: binary_version.to_string(),
             })
         } else {
             Ok(())

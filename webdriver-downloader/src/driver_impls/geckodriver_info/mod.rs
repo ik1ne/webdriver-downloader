@@ -5,7 +5,7 @@ use crate::os_specific::DefaultPathError;
 
 mod trait_impls;
 
-/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Geckodriver.
+/// [`WebdriverDownloadInfo`](crate::prelude::WebdriverDownloadInfo) implementation for Geckodriver.
 #[derive(Debug)]
 pub struct GeckodriverInfo {
     pub driver_install_path: PathBuf,
