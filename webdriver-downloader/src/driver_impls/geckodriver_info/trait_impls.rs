@@ -21,10 +21,16 @@ impl VersionReqUrlInfo for GeckodriverInfo {
     }
 
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
-        let download_html =
-            "https://firefox-source-docs.mozilla.org/_sources/testing/geckodriver/Support.md.txt";
+        // The source of https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html.
+        // The docs site no longer serves its `_sources/` copy of this file.
+        let download_html = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/testing/geckodriver/doc/Support.md";
 
-        let html = reqwest::get(download_html).await?.text().await?;
+        // Without error_for_status, an error page would parse as an empty table.
+        let html = reqwest::get(download_html)
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
 
         let html = html
             .lines()
