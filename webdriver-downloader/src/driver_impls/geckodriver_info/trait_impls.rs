@@ -8,7 +8,7 @@ use serde_json::{json, Map};
 
 use crate::os_specific;
 use crate::traits::installation_info::WebdriverInstallationInfo;
-use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
+use crate::traits::url_info::{fetch_text, UrlError, WebdriverVersionUrl};
 use crate::traits::verification_info::WebdriverVerificationInfo;
 use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
@@ -25,12 +25,7 @@ impl VersionReqUrlInfo for GeckodriverInfo {
         // The docs site no longer serves its `_sources/` copy of this file.
         let download_html = "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/testing/geckodriver/doc/Support.md";
 
-        // Without error_for_status, an error page would parse as an empty table.
-        let html = reqwest::get(download_html)
-            .await?
-            .error_for_status()?
-            .text()
-            .await?;
+        let html = fetch_text(download_html).await?;
 
         let html = html
             .lines()
@@ -55,9 +50,9 @@ impl VersionReqUrlInfo for GeckodriverInfo {
             let max_firefox_version_str = captures.get(4).ok_or_else(or_else)?.as_str();
 
             let webdriver_version = lenient_semver::parse(version_str)
-                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+                .map_err(|e| VersionReqError::ParseVersion(e.owned().into()))?;
             let min_version = lenient_semver::parse(min_firefox_version_str)
-                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+                .map_err(|e| VersionReqError::ParseVersion(e.owned().into()))?;
             let max_version = lenient_semver::parse(max_firefox_version_str).ok();
 
             let version_req_string = match max_version {
@@ -65,8 +60,8 @@ impl VersionReqUrlInfo for GeckodriverInfo {
                 None => format!(">= {}", min_version),
             };
 
-            let version_req =
-                VersionReq::parse(&version_req_string).map_err(VersionReqError::ParseVersionReq)?;
+            let version_req = VersionReq::parse(&version_req_string)
+                .map_err(|e| VersionReqError::ParseVersionReq(e.into()))?;
 
             versions.push(WebdriverVersionUrl {
                 version_req,
@@ -109,8 +104,9 @@ mod tests {
     use anyhow::Result;
     use test_log::test;
 
+    use crate::os_specific;
     use crate::prelude::GeckodriverInfo;
-    use crate::prelude::*;
+    use crate::traits::version_req_url_info::VersionReqUrlInfo;
 
     #[test]
     fn test_get_binary_version() -> Result<()> {

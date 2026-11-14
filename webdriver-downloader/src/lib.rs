@@ -29,9 +29,10 @@
 //! it to the default location.
 //! See [`default_driver_path`](os_specific::chromedriver::default_driver_path) for the default install location.
 //!
-//! # Implementing your own webdriver
+//! # Supporting another webdriver
 //!
-//! See [`traits`] for more information on how to implement your own webdriver.
+//! Drivers live in this crate, and [`WebdriverDownloadInfo`](traits::webdriver_download_info::WebdriverDownloadInfo)
+//! can't be implemented outside it. To add one, please open a pull request.
 
 #[cfg(all(feature = "rustls-tls", feature = "native-tls"))]
 #[rustfmt::skip]
@@ -64,12 +65,10 @@ pub mod prelude {
         chromedriver_info::ChromedriverInfo, geckodriver_info::GeckodriverInfo,
     };
     pub use crate::os_specific;
-    pub use crate::traits::installation_info::{
-        AddExecutePermissionError, InstallationError, WebdriverInstallationInfo,
-    };
-    pub use crate::traits::url_info::{UrlError, WebdriverUrlInfo, WebdriverVersionUrl};
-    pub use crate::traits::verification_info::{VerificationError, WebdriverVerificationInfo};
-    pub use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
+    pub use crate::traits::installation_info::{AddExecutePermissionError, InstallationError};
+    pub use crate::traits::url_info::UrlError;
+    pub use crate::traits::verification_info::VerificationError;
+    pub use crate::traits::version_req_url_info::VersionReqError;
     pub use crate::traits::webdriver_download_info::{
         WebdriverDownloadError, WebdriverDownloadInfo,
     };

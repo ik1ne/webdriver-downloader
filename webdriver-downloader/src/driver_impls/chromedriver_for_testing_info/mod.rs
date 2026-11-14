@@ -3,11 +3,11 @@ use std::path::PathBuf;
 use crate::driver_impls::chromedriver_info::OfflineVerificationError;
 use crate::os_specific;
 use crate::os_specific::DefaultPathError;
-use crate::prelude::VersionReqUrlInfo;
+use crate::traits::version_req_url_info::VersionReqUrlInfo;
 
 mod trait_impls;
 
-/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chrome for Testing.
+/// [`WebdriverDownloadInfo`](crate::prelude::WebdriverDownloadInfo) implementation for Chrome for Testing.
 #[derive(Debug)]
 pub struct ChromedriverForTestingInfo {
     pub driver_install_path: PathBuf,
@@ -48,8 +48,8 @@ impl ChromedriverForTestingInfo {
 
         if driver_version.major != binary_version.major {
             Err(OfflineVerificationError::VersionMismatch {
-                driver: driver_version,
-                browser: binary_version,
+                driver: driver_version.to_string(),
+                browser: binary_version.to_string(),
             })
         } else {
             Ok(())

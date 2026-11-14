@@ -1,7 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use semver::Version;
-
 use crate::driver_impls::chromedriver_for_testing_info::ChromedriverForTestingInfo;
 use crate::driver_impls::chromedriver_old_info::ChromedriverOldInfo;
 use crate::os_specific;
@@ -13,18 +11,17 @@ use crate::traits::version_req_url_info::VersionReqUrlInfo;
 mod trait_impls;
 
 #[derive(thiserror::Error, Debug)]
+#[non_exhaustive]
 pub enum OfflineVerificationError {
     #[error("Failed to get driver version")]
     DriverVersion(VersionReqError),
     #[error("Failed to get binary version")]
     BinaryVersion(VersionReqError),
     #[error("Driver and browser versions have different major version({driver} != {browser})")]
-    VersionMismatch { driver: Version, browser: Version },
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
+    VersionMismatch { driver: String, browser: String },
 }
 
-/// Information required to implement [WebdriverDownloadInfo](crate::prelude::WebdriverDownloadInfo) for Chromedriver.
+/// [`WebdriverDownloadInfo`](crate::prelude::WebdriverDownloadInfo) implementation for Chromedriver.
 /// This works on both old and new Chromedriver.
 #[derive(Debug)]
 pub enum ChromedriverInfo {
@@ -72,6 +69,22 @@ impl ChromedriverInfo {
         ))
     }
 
+    /// The path the driver is installed to.
+    pub fn driver_install_path(&self) -> &Path {
+        match self {
+            ChromedriverInfo::OldInfo(old_info) => &old_info.driver_install_path,
+            ChromedriverInfo::NewInfo(new_info) => &new_info.driver_install_path,
+        }
+    }
+
+    /// The path to the browser binary.
+    pub fn browser_path(&self) -> &Path {
+        match self {
+            ChromedriverInfo::OldInfo(old_info) => &old_info.browser_path,
+            ChromedriverInfo::NewInfo(new_info) => &new_info.browser_path,
+        }
+    }
+
     /// Set the path to install the driver to.
     pub fn set_install_path(&mut self, path: PathBuf) {
         match self {
@@ -103,8 +116,8 @@ impl ChromedriverInfo {
 
         if driver_version.major != binary_version.major {
             Err(OfflineVerificationError::VersionMismatch {
-                driver: driver_version,
-                browser: binary_version,
+                driver: driver_version.to_string(),
+                browser: binary_version.to_string(),
             })
         } else {
             Ok(())

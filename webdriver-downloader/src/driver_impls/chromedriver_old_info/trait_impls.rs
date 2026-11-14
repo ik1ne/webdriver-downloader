@@ -10,7 +10,7 @@ use serde_json::{json, Map};
 
 use crate::os_specific;
 use crate::traits::installation_info::WebdriverInstallationInfo;
-use crate::traits::url_info::{UrlError, WebdriverVersionUrl};
+use crate::traits::url_info::{fetch_text, UrlError, WebdriverVersionUrl};
 use crate::traits::verification_info::WebdriverVerificationInfo;
 use crate::traits::version_req_url_info::{VersionReqError, VersionReqUrlInfo};
 
@@ -25,7 +25,7 @@ impl VersionReqUrlInfo for ChromedriverOldInfo {
     async fn driver_version_urls(&self) -> Result<Vec<WebdriverVersionUrl>, UrlError> {
         let download_xml = "https://chromedriver.storage.googleapis.com";
 
-        let xml = reqwest::get(download_xml).await?.text().await?;
+        let xml = fetch_text(download_xml).await?;
 
         let re = Regex::new(os_specific::chromedriver_old::ZIPFILE_NAME_RE)
             .expect("Failed to parse regex.");
@@ -37,10 +37,10 @@ impl VersionReqUrlInfo for ChromedriverOldInfo {
 
             let version_str = captures.get(1).ok_or_else(or_else)?.as_str();
             let webdriver_version = lenient_semver::parse(version_str)
-                .map_err(|e| VersionReqError::ParseVersion(e.owned()))?;
+                .map_err(|e| VersionReqError::ParseVersion(e.owned().into()))?;
 
             let version_req = VersionReq::parse(&format!("^{}", webdriver_version))
-                .map_err(VersionReqError::ParseVersionReq)?;
+                .map_err(|e| VersionReqError::ParseVersionReq(e.into()))?;
 
             versions.push(WebdriverVersionUrl {
                 version_req,
@@ -91,7 +91,8 @@ mod tests {
     use anyhow::Result;
     use test_log::test;
 
-    use crate::prelude::*;
+    use crate::os_specific;
+    use crate::traits::version_req_url_info::VersionReqUrlInfo;
 
     use super::ChromedriverOldInfo;
 

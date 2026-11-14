@@ -1,5 +1,5 @@
 #[cfg(target_family = "unix")]
-pub use unix_family::*;
+pub(crate) use unix_family::*;
 
 #[cfg(target_os = "linux")]
 pub use linux::*;

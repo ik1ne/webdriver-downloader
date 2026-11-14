@@ -7,25 +7,26 @@ use async_trait::async_trait;
 use fantoccini::wd::Capabilities;
 use fantoccini::Locator;
 
+use crate::traits::BoxError;
+
 const WEBDRIVER_WAIT_DURATION: Duration = Duration::from_millis(500);
 const MAX_RETRIES: usize = 10;
 
 /// Error that can occur during verification.
 #[derive(thiserror::Error, Debug)]
+#[non_exhaustive]
 pub enum VerificationError {
     #[error("Failed to start driver: {0}")]
     Start(#[from] std::io::Error),
     #[error("Failed to connect to driver: {0}")]
-    Connect(#[from] fantoccini::error::NewSessionError),
+    Connect(#[source] BoxError),
     #[error("Driver test failed to pass: {0}")]
-    Navigate(#[from] fantoccini::error::CmdError),
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
+    Navigate(#[source] BoxError),
 }
 
 /// Provides information for verifying a webdriver.
 #[async_trait]
-pub trait WebdriverVerificationInfo {
+pub(crate) trait WebdriverVerificationInfo {
     /// Capabilities to use for verification.
     /// Some driver options such as browser path can be provided by capabilities.
     fn driver_capabilities(&self) -> Option<Capabilities>;
@@ -67,7 +68,7 @@ pub trait WebdriverVerificationInfo {
                 Ok(client) => break client,
                 Err(e) => {
                     if current_tries >= MAX_RETRIES {
-                        return Err(VerificationError::Connect(e));
+                        return Err(VerificationError::Connect(e.into()));
                     }
 
                     current_tries += 1;
@@ -91,8 +92,13 @@ pub trait WebdriverVerificationInfo {
 
     /// Tests driver using [`fantoccini::Client`]. Default implementation navigates to `example.com`.
     async fn test_client(client: &fantoccini::Client) -> Result<(), VerificationError> {
-        client.goto("https://www.example.com").await?;
-        client.find(Locator::Css("html")).await?;
+        let navigate = |e: fantoccini::error::CmdError| VerificationError::Navigate(e.into());
+
+        client
+            .goto("https://www.example.com")
+            .await
+            .map_err(navigate)?;
+        client.find(Locator::Css("html")).await.map_err(navigate)?;
 
         Ok(())
     }
