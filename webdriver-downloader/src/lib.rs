@@ -27,7 +27,7 @@
 //!
 //! This will download the latest version of chromedriver, verify it, and install
 //! it to the default location.
-//! See [`default_install_path`](os_specific::chromedriver_old::default_driver_path)s for default install locations.
+//! See [`default_driver_path`](os_specific::chromedriver::default_driver_path) for the default install location.
 //!
 //! # Implementing your own webdriver
 //!
