@@ -10,6 +10,29 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Mirrors the docs.rs build (nightly, x86_64 Linux, `--cfg docsrs`, lib only)
+  # so a broken doc link fails here instead of on docs.rs after publishing.
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-nightly-docs-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install nightly rust
+        run: rustup toolchain install nightly --profile minimal
+      - name: Build docs
+        run: cargo +nightly doc --no-deps --lib -p webdriver-downloader
+        env:
+          RUSTDOCFLAGS: --cfg docsrs -D warnings
+
   ubuntu:
     runs-on: ubuntu-latest
 
